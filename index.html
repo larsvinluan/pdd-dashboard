@@ -1,0 +1,983 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Programs and Development Division Projects</title>
+
+  <style>
+    :root {
+      --navy: #071b3a;
+      --navy-soft: #102c58;
+      --text: #1e293b;
+      --muted: #64748b;
+      --line: rgba(226, 232, 240, 0.95);
+      --glass: rgba(255, 255, 255, 0.78);
+      --white: #ffffff;
+      --cyan: #00c7d7;
+      --blue: #149dff;
+      --purple: #9b35e5;
+      --pink: #ff2f92;
+      --orange: #ff7a18;
+      --yellow: #ffd21a;
+      --green: #65e833;
+      --shadow: 0 28px 80px rgba(15, 23, 42, 0.18);
+    }
+
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      font-family: Arial, Helvetica, sans-serif;
+      color: var(--text);
+      background:
+        radial-gradient(circle at 8% 86%, rgba(0, 199, 215, 0.30), transparent 26%),
+        radial-gradient(circle at 92% 72%, rgba(155, 53, 229, 0.16), transparent 28%),
+        linear-gradient(135deg, #f7fbff 0%, #edf4fb 45%, #fbfdff 100%);
+      overflow-x: hidden;
+    }
+
+    .page {
+      width: min(1420px, calc(100% - 20px));
+      min-height: calc(100vh - 20px);
+      margin: 10px auto;
+      position: relative;
+      overflow: hidden;
+      border-radius: 34px;
+      border: 1px solid rgba(226, 232, 240, 0.95);
+      background:
+        linear-gradient(135deg, rgba(255, 255, 255, 0.98), rgba(255, 255, 255, 0.90)),
+        radial-gradient(circle at 58% 28%, rgba(0, 199, 215, 0.13), transparent 30%),
+        radial-gradient(circle at 86% 70%, rgba(247, 37, 133, 0.12), transparent 30%);
+      box-shadow: var(--shadow);
+      padding: 30px 42px 32px;
+    }
+
+    .page::before {
+      content: "";
+      position: absolute;
+      width: 690px;
+      height: 690px;
+      right: -280px;
+      top: -260px;
+      border-radius: 50%;
+      background: rgba(15, 27, 49, 0.035);
+      z-index: 0;
+    }
+
+    .page::after {
+      content: "";
+      position: absolute;
+      width: 820px;
+      height: 820px;
+      left: -390px;
+      bottom: -315px;
+      border-radius: 50%;
+      background: rgba(0, 199, 215, 0.11);
+      z-index: 0;
+    }
+
+    .decor-lines {
+      position: absolute;
+      right: -155px;
+      top: 102px;
+      width: 560px;
+      height: 560px;
+      border-radius: 50%;
+      border: 1px solid rgba(15, 27, 49, 0.07);
+      z-index: 0;
+      pointer-events: none;
+    }
+
+    .decor-lines::before,
+    .decor-lines::after {
+      content: "";
+      position: absolute;
+      border-radius: 50%;
+      border: 1px solid rgba(15, 27, 49, 0.055);
+    }
+
+    .decor-lines::before { inset: 34px; }
+    .decor-lines::after { inset: 68px; }
+
+    .dot-pattern {
+      position: absolute;
+      width: 170px;
+      height: 170px;
+      left: 120px;
+      top: 260px;
+      opacity: 0.22;
+      z-index: 0;
+      background-image: radial-gradient(circle, #149dff 2px, transparent 2px);
+      background-size: 15px 15px;
+    }
+
+    .topbar {
+      position: relative;
+      z-index: 5;
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: 22px;
+      align-items: start;
+    }
+
+    .main-title {
+      margin: 0;
+      color: var(--navy);
+      font-size: clamp(30px, 4.4vw, 58px);
+      line-height: 0.94;
+      font-weight: 950;
+      letter-spacing: -1.5px;
+      text-transform: uppercase;
+    }
+
+    .title-gradient {
+      display: inline-block;
+      margin-top: 4px;
+      font-size: clamp(50px, 7vw, 88px);
+      letter-spacing: -2.5px;
+      background: linear-gradient(90deg, #149dff 0%, #8a35e5 42%, #f72585 70%, #ffb000 100%);
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+      filter: drop-shadow(0 6px 16px rgba(20, 157, 255, 0.18));
+    }
+
+    .title-line {
+      width: 290px;
+      height: 7px;
+      margin-top: 14px;
+      border-radius: 999px;
+      background: linear-gradient(90deg, #149dff, #8a35e5, #f72585, #ff9f00, #59d12f, #149dff);
+      position: relative;
+      box-shadow: 0 0 20px rgba(20, 157, 255, 0.32);
+    }
+
+    .title-line::before,
+    .title-line::after {
+      content: "";
+      position: absolute;
+      top: 50%;
+      width: 9px;
+      height: 9px;
+      transform: translateY(-50%);
+      border-radius: 50%;
+      background: #149dff;
+    }
+
+    .title-line::before { left: 0; }
+    .title-line::after { right: 0; }
+
+    .mode-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 11px;
+      padding: 15px 20px;
+      border-radius: 999px;
+      background: rgba(255, 255, 255, 0.92);
+      color: #08798c;
+      border: 1px solid rgba(184, 243, 247, 0.95);
+      font-size: 15px;
+      font-weight: 950;
+      letter-spacing: 0.7px;
+      text-transform: uppercase;
+      white-space: nowrap;
+      box-shadow: 0 14px 32px rgba(15, 23, 42, 0.10);
+      backdrop-filter: blur(14px);
+    }
+
+    .mode-dot {
+      width: 12px;
+      height: 12px;
+      border-radius: 50%;
+      background: #11b7bd;
+      box-shadow: 0 0 0 7px rgba(17, 183, 189, 0.16);
+    }
+
+    .date-text {
+      display: block;
+      margin-top: 4px;
+      color: #64748b;
+      font-size: 11px;
+      font-weight: 700;
+      text-transform: none;
+      letter-spacing: 0;
+    }
+
+    .message {
+      position: relative;
+      z-index: 6;
+      display: none;
+      margin-top: 14px;
+      padding: 12px 14px;
+      border-radius: 14px;
+      background: #fff7ed;
+      color: #9a3412;
+      border: 1px solid #fed7aa;
+      font-size: 14px;
+      font-weight: 700;
+    }
+
+    .infographic-area {
+      position: relative;
+      z-index: 2;
+      width: 100%;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      margin-top: -140px;
+      pointer-events: none;
+    }
+
+    .wheel-box {
+      width: min(960px, 100%);
+      aspect-ratio: 1 / 1;
+      position: relative;
+      pointer-events: auto;
+    }
+
+    svg {
+      width: 100%;
+      height: 100%;
+      display: block;
+      overflow: visible;
+    }
+
+    .segment-path {
+      cursor: pointer;
+      transition: transform 0.22s ease, filter 0.22s ease;
+      transform-box: fill-box;
+      transform-origin: center;
+      stroke: #ffffff;
+      stroke-width: 9;
+      stroke-linejoin: round;
+      filter:
+        drop-shadow(0 17px 11px rgba(15, 23, 42, 0.28))
+        drop-shadow(0 0 15px rgba(255, 255, 255, 0.50));
+    }
+
+    .segment-path:hover,
+    .segment-path.active {
+      transform: scale(1.03);
+      filter:
+        drop-shadow(0 25px 18px rgba(15, 23, 42, 0.35))
+        drop-shadow(0 0 28px rgba(255, 255, 255, 0.96));
+    }
+
+    .segment-hit {
+      cursor: pointer;
+      fill: transparent;
+      stroke: transparent;
+      stroke-width: 0;
+      pointer-events: all;
+    }
+
+    .segment-highlight {
+      pointer-events: none;
+      opacity: 0.38;
+      mix-blend-mode: screen;
+    }
+
+    .label-object { pointer-events: none; }
+
+    .segment-label {
+      pointer-events: none;
+      color: #ffffff;
+      text-align: center;
+      text-shadow:
+        0 3px 8px rgba(0, 0, 0, 0.34),
+        0 0 14px rgba(255, 255, 255, 0.25);
+      font-family: Arial, Helvetica, sans-serif;
+    }
+
+    .segment-label .icon {
+      font-size: 43px;
+      line-height: 1;
+      margin-bottom: 8px;
+      font-weight: 900;
+    }
+
+    .segment-label .title {
+      font-size: 18px;
+      line-height: 1.06;
+      font-weight: 950;
+      letter-spacing: 0.5px;
+      text-transform: uppercase;
+    }
+
+    .segment-label .rule {
+      width: 128px;
+      height: 2px;
+      background: rgba(255, 255, 255, 0.90);
+      margin: 10px auto 9px;
+    }
+
+    .segment-label .desc {
+      font-size: 11.5px;
+      line-height: 1.32;
+      font-weight: 700;
+      opacity: 0.96;
+      max-width: 150px;
+      margin: 0 auto;
+    }
+
+    .center-circle,
+    .center-logo-wrap { pointer-events: none; }
+
+    .center-circle {
+      filter:
+        drop-shadow(0 18px 22px rgba(15, 23, 42, 0.30))
+        drop-shadow(0 0 22px rgba(0, 199, 215, 0.30));
+    }
+
+    .center-logo-wrap {
+      filter:
+        drop-shadow(0 14px 22px rgba(15, 23, 42, 0.28))
+        drop-shadow(0 0 18px rgba(255, 255, 255, 0.84));
+    }
+
+    .details-panel {
+      position: relative;
+      z-index: 8;
+      margin: -28px auto 0;
+      width: min(1260px, 100%);
+      background: linear-gradient(135deg, rgba(255, 255, 255, 0.98), rgba(255, 255, 255, 0.92));
+      border: 1px solid rgba(226, 232, 240, 0.95);
+      border-radius: 26px;
+      box-shadow: 0 22px 52px rgba(15, 23, 42, 0.14);
+      padding: 20px 26px;
+      display: grid;
+      grid-template-columns: 116px 1fr;
+      gap: 19px;
+      align-items: center;
+      backdrop-filter: blur(16px);
+    }
+
+    .detail-icon {
+      width: 98px;
+      height: 98px;
+      border-radius: 50%;
+      display: grid;
+      place-items: center;
+      color: #ffffff;
+      font-size: 44px;
+      font-weight: 900;
+      box-shadow:
+        0 17px 32px rgba(15, 23, 42, 0.25),
+        inset 0 0 0 1px rgba(255, 255, 255, 0.30);
+    }
+
+    .detail-title {
+      margin: 0;
+      font-size: 24px;
+      color: #0097a7;
+      font-weight: 950;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+    }
+
+    .detail-desc {
+      margin: 7px 0 13px;
+      color: #475569;
+      line-height: 1.4;
+      font-size: 16px;
+      font-weight: 600;
+    }
+
+    .detail-grid {
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      gap: 12px;
+      margin-bottom: 12px;
+    }
+
+    .detail-card {
+      min-height: 62px;
+      padding: 12px 14px;
+      border: 1px solid var(--line);
+      border-radius: 14px;
+      background: rgba(255, 255, 255, 0.94);
+      box-shadow: 0 5px 14px rgba(15, 23, 42, 0.05);
+    }
+
+    .detail-label {
+      color: #64748b;
+      font-size: 10px;
+      font-weight: 900;
+      margin-bottom: 5px;
+      text-transform: uppercase;
+      letter-spacing: 0.4px;
+    }
+
+    .detail-value {
+      color: var(--navy);
+      font-size: 15px;
+      font-weight: 950;
+      line-height: 1.25;
+    }
+
+    .wide-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+    }
+
+    .wide-card {
+      padding: 12px 14px;
+      border: 1px solid var(--line);
+      border-radius: 14px;
+      background: rgba(255, 255, 255, 0.94);
+      box-shadow: 0 5px 14px rgba(15, 23, 42, 0.05);
+    }
+
+    .hint {
+      margin-top: 12px;
+      text-align: center;
+      color: #475569;
+      font-size: 14px;
+      font-weight: 700;
+    }
+
+    .actions {
+      position: relative;
+      z-index: 9;
+      display: flex;
+      justify-content: center;
+      gap: 10px;
+      flex-wrap: wrap;
+      margin-top: 16px;
+    }
+
+    button {
+      cursor: pointer;
+      border: 0;
+      border-radius: 999px;
+      padding: 11px 20px;
+      background: linear-gradient(90deg, #149dff, #8a35e5, #f72585, #ff9f00);
+      color: #ffffff;
+      font-weight: 950;
+      letter-spacing: 0.4px;
+      box-shadow: 0 10px 25px rgba(15, 23, 42, 0.18);
+      transition: 0.2s ease;
+    }
+
+    button:hover {
+      transform: translateY(-1px);
+      filter: brightness(1.04);
+    }
+
+    .ghost-btn {
+      background: rgba(255, 255, 255, 0.88);
+      color: var(--navy);
+      border: 1px solid var(--line);
+    }
+
+    @media (max-width: 1120px) {
+      .infographic-area { margin-top: -50px; }
+      .details-panel { margin-top: -8px; }
+    }
+
+    @media (max-width: 900px) {
+      .page { padding: 20px 14px 24px; }
+      .topbar { grid-template-columns: 1fr; }
+      .infographic-area { margin-top: 8px; }
+      .wheel-box { width: 100%; }
+      .segment-label .icon { font-size: 28px; margin-bottom: 5px; }
+      .segment-label .title { font-size: 12px; }
+      .segment-label .rule { width: 82px; margin: 7px auto; }
+      .segment-label .desc { font-size: 9px; max-width: 110px; }
+      .details-panel { grid-template-columns: 1fr; text-align: center; }
+      .detail-icon { margin: 0 auto; }
+      .detail-grid { grid-template-columns: repeat(2, 1fr); }
+      .wide-grid { grid-template-columns: 1fr; }
+    }
+
+    @media (max-width: 560px) {
+      .main-title { font-size: 28px; }
+      .title-gradient { font-size: 42px; }
+      .segment-label .desc,
+      .segment-label .rule { display: none; }
+      .segment-label .title { font-size: 8px; }
+      .segment-label .icon { font-size: 19px; }
+      .detail-grid { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+
+<body>
+  <main class="page">
+    <div class="decor-lines"></div>
+    <div class="dot-pattern"></div>
+
+    <div class="topbar">
+      <div>
+        <h1 class="main-title">
+          PROGRAMS AND<br>
+          DEVELOPMENT DIVISION<br>
+          <span class="title-gradient">PROJECTS</span>
+        </h1>
+        <div class="title-line"></div>
+      </div>
+
+      <div class="mode-pill">
+        <span class="mode-dot"></span>
+        <span>
+          <span id="modeText">Demo Data</span>
+          <span id="dateText" class="date-text">Ready</span>
+        </span>
+      </div>
+    </div>
+
+    <div id="message" class="message"></div>
+
+    <section class="infographic-area">
+      <div class="wheel-box">
+        <svg viewBox="0 0 900 900" role="img" aria-label="Programs and Development Division Projects">
+          <defs id="gradientDefs"></defs>
+
+          <g id="segmentsGroup"></g>
+          <g id="highlightsGroup"></g>
+          <g id="labelsGroup"></g>
+
+          <g class="center-circle">
+            <circle cx="450" cy="455" r="176" fill="#ffffff"></circle>
+            <circle cx="450" cy="455" r="166" fill="url(#centerOuterGradient)"></circle>
+            <circle cx="450" cy="455" r="140" fill="#ffffff"></circle>
+            <circle cx="450" cy="455" r="128" fill="url(#centerInnerGradient)"></circle>
+          </g>
+
+          <g class="center-logo-wrap">
+            <clipPath id="logoClip">
+              <circle cx="450" cy="455" r="118"></circle>
+            </clipPath>
+
+            <image
+              id="centerLogo"
+              x="332"
+              y="337"
+              width="236"
+              height="236"
+              preserveAspectRatio="xMidYMid meet"
+              clip-path="url(#logoClip)">
+            </image>
+
+            <circle cx="450" cy="455" r="119" fill="none" stroke="rgba(255,255,255,0.96)" stroke-width="8"></circle>
+            <circle cx="450" cy="455" r="130" fill="none" stroke="rgba(0,199,215,0.35)" stroke-width="3"></circle>
+          </g>
+
+          <g id="hitGroup"></g>
+        </svg>
+      </div>
+    </section>
+
+    <section class="details-panel">
+      <div id="detailIcon" class="detail-icon">◎</div>
+
+      <div>
+        <h2 id="detailTitle" class="detail-title">Loading...</h2>
+        <p id="detailDesc" class="detail-desc">Please wait while data is loading.</p>
+
+        <div class="detail-grid">
+          <div class="detail-card"><div class="detail-label">Status</div><div id="detailStatus" class="detail-value">-</div></div>
+          <div class="detail-card"><div class="detail-label">Progress</div><div id="detailProgress" class="detail-value">-</div></div>
+          <div class="detail-card"><div class="detail-label">Timeline</div><div id="detailTimeline" class="detail-value">-</div></div>
+          <div class="detail-card"><div class="detail-label">Budget</div><div id="detailBudget" class="detail-value">-</div></div>
+          <div class="detail-card"><div class="detail-label">Utilization</div><div id="detailUtilization" class="detail-value">-</div></div>
+        </div>
+
+        <div class="wide-grid">
+          <div class="wide-card"><div class="detail-label">Accomplishment</div><div id="detailAccomplishment" class="detail-value">-</div></div>
+          <div class="wide-card"><div class="detail-label">Remarks</div><div id="detailRemarks" class="detail-value">-</div></div>
+        </div>
+
+        <div class="hint">☝ Click any segment to view details</div>
+      </div>
+    </section>
+
+    <div class="actions">
+      <button onclick="loadData()">Refresh Data</button>
+      <button class="ghost-btn" onclick="window.print()">Print / Save PDF</button>
+    </div>
+  </main>
+
+  <script>
+    /*
+      GITHUB PAGES SETUP:
+      Option 1: Demo mode - leave SHEET_CSV_URL blank.
+      Option 2: Connect Google Sheets:
+      File > Share > Publish to web > Projects sheet > Comma-separated values (.csv)
+      Paste the published CSV link below.
+    */
+
+    const SHEET_CSV_URL = "";
+
+    const LOGO_FILE_ID = "12eGD35nc4o7Fpns98RN1bK6vbntkK2Kx";
+    const LOGO_URL = "https://drive.google.com/thumbnail?id=" + LOGO_FILE_ID + "&sz=w1000";
+
+    const DEFAULT_DATA = [
+      { department: "Center of Excellence", title: "CENTER OF EXCELLENCE", icon: "trophy", color: "#00C7D7", color2: "#007C8E", description: "Promotes excellence through specialized programs and innovation.", project: "Centers of Excellence Evaluation and Monitoring", status: "Ongoing", progress: 82, timeline: "Q1 - Q4", budget: "N/A", utilization: "N/A", accomplishment: "Center initiatives and programs are actively implemented.", remarks: "Continue monitoring and strengthening programs." },
+      { department: "Equivalency", title: "EQUIVALENCY", icon: "certificate", color: "#B53DFF", color2: "#4B1C8C", description: "Ensures quality and recognition of prior learning.", project: "Certificate of Equivalency Evaluation", status: "Ongoing", progress: 76, timeline: "Year-round", budget: "N/A", utilization: "N/A", accomplishment: "Applications are evaluated based on documentary requirements.", remarks: "Continue processing and technical review." },
+      { department: "NAFES", title: "NAFES", icon: "people", color: "#FF2F92", color2: "#B5179E", description: "Strengthens flexible education and learning systems.", project: "National Academic Framework and Flexible Learning Systems", status: "Ongoing", progress: 70, timeline: "Q2 - Q4", budget: "N/A", utilization: "N/A", accomplishment: "Framework development and coordination activities are ongoing.", remarks: "For continued consultation and refinement." },
+      { department: "PQF", title: "PQF", icon: "badge", color: "#FF8A1F", color2: "#E05208", description: "Aligns qualifications with national and international standards.", project: "Philippine Qualifications Framework Alignment", status: "Ongoing", progress: 80, timeline: "Q1 - Q4", budget: "N/A", utilization: "N/A", accomplishment: "PQF-related activities and coordination are being implemented.", remarks: "Sustain alignment activities and monitoring." },
+      { department: "Seed Fund for Medicine", title: "SEED FUND FOR MEDICINE", icon: "seed", color: "#FFD21A", color2: "#FF9F00", description: "Supports medical research and development initiatives.", project: "Seed Fund for Medicine Program Support", status: "For Monitoring", progress: 68, timeline: "Q2 - Q4", budget: "For updating", utilization: "For updating", accomplishment: "Initial support mechanisms and monitoring items are being consolidated.", remarks: "Update funding and utilization data." },
+      { department: "Honoris Causa", title: "HONORIS CAUSA", icon: "cap", color: "#65E833", color2: "#168A20", description: "Recognizes outstanding individuals for significant contributions.", project: "Honorary Degree Policy and Review", status: "Ongoing", progress: 72, timeline: "As needed", budget: "N/A", utilization: "N/A", accomplishment: "Policy review and documentation activities are ongoing.", remarks: "Ensure consistency with applicable guidelines." },
+      { department: "PSG Development", title: "PSG DEVELOPMENT", icon: "chart", color: "#18A8FF", color2: "#005BBB", description: "Enhances institutional performance and sustainability.", project: "Policies, Standards and Guidelines Development", status: "Ongoing", progress: 85, timeline: "Year-round", budget: "N/A", utilization: "N/A", accomplishment: "PSG development and revision activities are being coordinated.", remarks: "Continue technical panel coordination and policy refinement." }
+    ];
+
+    const SVG_NS = "http://www.w3.org/2000/svg";
+    const XLINK_NS = "http://www.w3.org/1999/xlink";
+    let items = [];
+
+    const center = { x: 450, y: 455 };
+    const outerRadius = 374;
+    const innerRadius = 184;
+
+    const segmentAngles = [
+      { start: 334, end: 386 }, { start: 386, end: 438 }, { start: 438, end: 490 },
+      { start: 490, end: 542 }, { start: 178, end: 230 }, { start: 230, end: 282 }, { start: 282, end: 334 }
+    ];
+
+    const labelPositions = [
+      { x: 450, y: 195, w: 205, h: 170 }, { x: 665, y: 305, w: 195, h: 165 },
+      { x: 704, y: 535, w: 195, h: 160 }, { x: 565, y: 708, w: 205, h: 155 },
+      { x: 335, y: 708, w: 210, h: 155 }, { x: 196, y: 535, w: 205, h: 160 },
+      { x: 235, y: 305, w: 205, h: 165 }
+    ];
+
+    const icons = { trophy: "🏆", certificate: "▤", people: "☷", badge: "✓", seed: "♧", cap: "◇", chart: "↗" };
+
+    document.addEventListener("DOMContentLoaded", loadData);
+
+    async function loadData() {
+      setMessage("");
+      setCenterLogo();
+
+      if (!SHEET_CSV_URL) {
+        items = DEFAULT_DATA;
+        setMode("Demo Data", "Ready");
+        renderInfographic();
+        selectSegment(0);
+        return;
+      }
+
+      try {
+        setMode("Loading", "Please wait");
+        const response = await fetch(SHEET_CSV_URL + cacheBuster(), { method: "GET", cache: "no-store" });
+        if (!response.ok) throw new Error("Unable to load Google Sheet CSV.");
+
+        const rows = parseCSV(await response.text());
+        if (!rows || rows.length < 2) throw new Error("CSV has no data rows.");
+
+        const liveItems = mapRowsToProjects(rows);
+        items = liveItems.length ? liveItems : DEFAULT_DATA;
+        setMode("Live Data", new Date().toLocaleString());
+        renderInfographic();
+        selectSegment(0);
+      } catch (error) {
+        items = DEFAULT_DATA;
+        setMode("Demo Data", "CSV not loaded");
+        setMessage("Unable to load Google Sheet data. Showing demo data. " + error.message);
+        renderInfographic();
+        selectSegment(0);
+      }
+    }
+
+    function setMode(mode, dateText) {
+      document.getElementById("modeText").textContent = mode;
+      document.getElementById("dateText").textContent = dateText || "";
+    }
+
+    function setCenterLogo() {
+      const logo = document.getElementById("centerLogo");
+      if (!logo) return;
+      logo.setAttribute("href", LOGO_URL);
+      logo.setAttributeNS(XLINK_NS, "href", LOGO_URL);
+    }
+
+    function mapRowsToProjects(rows) {
+      const headers = rows[0].map(normalizeHeader);
+      const dataRows = rows.slice(1).filter(row => row.some(cell => String(cell || "").trim() !== ""));
+
+      const records = dataRows.map(row => ({
+        department: getCell(row, headers, ["department", "project area", "program", "category"]),
+        project: getCell(row, headers, ["project", "project title", "activity", "program title"]),
+        status: getCell(row, headers, ["status", "project status"]),
+        progress: parseProgress(getCell(row, headers, ["progress", "percentage", "completion", "accomplishment rate"])),
+        timeline: getCell(row, headers, ["timeline", "target date", "period", "schedule"]),
+        budget: getCell(row, headers, ["budget", "allocated budget", "amount"]),
+        utilization: getCell(row, headers, ["utilization", "budget utilization", "utilized", "disbursement"]),
+        accomplishment: getCell(row, headers, ["accomplishment", "output", "deliverable", "result"]),
+        remarks: getCell(row, headers, ["remarks", "notes", "comments"])
+      }));
+
+      return DEFAULT_DATA.map(defaultItem => {
+        const matching = records.filter(record => {
+          const dept = String(record.department || "").toLowerCase().trim();
+          const title = String(defaultItem.department || "").toLowerCase().trim();
+          return dept === title || dept.includes(title) || title.includes(dept);
+        });
+
+        if (!matching.length) return defaultItem;
+
+        const progressTotal = matching.reduce((sum, item) => sum + Number(item.progress || 0), 0);
+        const averageProgress = matching.length ? Math.round(progressTotal / matching.length) : defaultItem.progress;
+
+        return {
+          ...defaultItem,
+          project: matching.length === 1 ? matching[0].project || defaultItem.project : matching.length + " Projects",
+          status: summarizeStatus(matching),
+          progress: averageProgress,
+          timeline: uniqueJoin(matching.map(item => item.timeline)) || defaultItem.timeline,
+          budget: uniqueJoin(matching.map(item => item.budget)) || defaultItem.budget,
+          utilization: uniqueJoin(matching.map(item => item.utilization)) || defaultItem.utilization,
+          accomplishment: matching[0].accomplishment || defaultItem.accomplishment,
+          remarks: matching[0].remarks || defaultItem.remarks
+        };
+      });
+    }
+
+    function renderInfographic() {
+      const defs = document.getElementById("gradientDefs");
+      const segmentsGroup = document.getElementById("segmentsGroup");
+      const highlightsGroup = document.getElementById("highlightsGroup");
+      const labelsGroup = document.getElementById("labelsGroup");
+      const hitGroup = document.getElementById("hitGroup");
+
+      defs.innerHTML = `
+        <radialGradient id="centerOuterGradient" cx="50%" cy="35%" r="70%">
+          <stop offset="0%" stop-color="#F8FFFF"></stop>
+          <stop offset="40%" stop-color="#FFFFFF"></stop>
+          <stop offset="100%" stop-color="#B5F3FA"></stop>
+        </radialGradient>
+        <radialGradient id="centerInnerGradient" cx="50%" cy="35%" r="70%">
+          <stop offset="0%" stop-color="#FFFFFF"></stop>
+          <stop offset="100%" stop-color="#F5FBFF"></stop>
+        </radialGradient>
+      `;
+
+      segmentsGroup.innerHTML = "";
+      highlightsGroup.innerHTML = "";
+      labelsGroup.innerHTML = "";
+      hitGroup.innerHTML = "";
+
+      items.slice(0, 7).forEach((item, index) => {
+        const gradientId = "segGradient" + index;
+        const shineId = "shineGradient" + index;
+        const edgeId = "edgeGradient" + index;
+
+        const gradient = createSvgElement("linearGradient", { id: gradientId, x1: "0%", y1: "0%", x2: "100%", y2: "100%" });
+        gradient.appendChild(createSvgElement("stop", { offset: "0%", "stop-color": lightenColor(item.color || "#00B7C6", 24) }));
+        gradient.appendChild(createSvgElement("stop", { offset: "48%", "stop-color": item.color || "#00B7C6" }));
+        gradient.appendChild(createSvgElement("stop", { offset: "100%", "stop-color": item.color2 || item.color || "#007C8E" }));
+        defs.appendChild(gradient);
+
+        const shine = createSvgElement("linearGradient", { id: shineId, x1: "0%", y1: "0%", x2: "0%", y2: "100%" });
+        shine.appendChild(createSvgElement("stop", { offset: "0%", "stop-color": "#FFFFFF", "stop-opacity": "0.68" }));
+        shine.appendChild(createSvgElement("stop", { offset: "46%", "stop-color": "#FFFFFF", "stop-opacity": "0.10" }));
+        shine.appendChild(createSvgElement("stop", { offset: "100%", "stop-color": "#FFFFFF", "stop-opacity": "0" }));
+        defs.appendChild(shine);
+
+        const edge = createSvgElement("linearGradient", { id: edgeId, x1: "0%", y1: "0%", x2: "100%", y2: "0%" });
+        edge.appendChild(createSvgElement("stop", { offset: "0%", "stop-color": "#FFFFFF", "stop-opacity": "0.95" }));
+        edge.appendChild(createSvgElement("stop", { offset: "100%", "stop-color": item.color || "#00B7C6", "stop-opacity": "0.95" }));
+        defs.appendChild(edge);
+
+        const angle = segmentAngles[index];
+        const segmentD = describeDonutSegment(center.x, center.y, innerRadius, outerRadius, angle.start, angle.end);
+
+        const path = createSvgElement("path", { d: segmentD, fill: "url(#" + gradientId + ")", class: "segment-path", "data-index": index });
+        path.addEventListener("click", () => selectSegment(index));
+        segmentsGroup.appendChild(path);
+
+        highlightsGroup.appendChild(createSvgElement("path", {
+          d: describeDonutSegment(center.x, center.y, innerRadius + 16, outerRadius - 15, angle.start + 2, angle.end - 2),
+          fill: "url(#" + shineId + ")", class: "segment-highlight"
+        }));
+
+        highlightsGroup.appendChild(createSvgElement("path", {
+          d: describeDonutSegment(center.x, center.y, outerRadius - 16, outerRadius - 6, angle.start + 3, angle.end - 3),
+          fill: "url(#" + edgeId + ")", class: "segment-highlight"
+        }));
+
+        createSegmentLabel(labelsGroup, item, index);
+
+        const hitPath = createSvgElement("path", { d: segmentD, class: "segment-hit", "data-index": index });
+        hitPath.addEventListener("click", () => selectSegment(index));
+        hitPath.addEventListener("mouseenter", () => setHoverState(index, true));
+        hitPath.addEventListener("mouseleave", () => setHoverState(index, false));
+        hitGroup.appendChild(hitPath);
+      });
+    }
+
+    function createSegmentLabel(parent, item, index) {
+      const pos = labelPositions[index];
+      const foreignObject = createSvgElement("foreignObject", {
+        x: pos.x - pos.w / 2,
+        y: pos.y - pos.h / 2,
+        width: pos.w,
+        height: pos.h,
+        class: "label-object"
+      });
+
+      const div = document.createElement("div");
+      div.setAttribute("xmlns", "http://www.w3.org/1999/xhtml");
+      div.className = "segment-label";
+      div.innerHTML = `
+        <div class="icon">${icons[item.icon] || "◎"}</div>
+        <div class="title">${escapeHtml(item.title || item.department || "")}</div>
+        <div class="rule"></div>
+        <div class="desc">${escapeHtml(item.description || "")}</div>
+      `;
+      foreignObject.appendChild(div);
+      parent.appendChild(foreignObject);
+    }
+
+    function selectSegment(index) {
+      document.querySelectorAll(".segment-path").forEach(path => {
+        const isSelected = Number(path.getAttribute("data-index")) === index;
+        path.classList.toggle("active", isSelected);
+        path.classList.toggle("selected", isSelected);
+      });
+
+      const item = items[index];
+      if (!item) return;
+
+      document.getElementById("detailIcon").textContent = icons[item.icon] || "◎";
+      document.getElementById("detailIcon").style.background =
+        "linear-gradient(135deg, " + (item.color || "#00B7C6") + ", " + (item.color2 || item.color || "#007C8E") + ")";
+
+      document.getElementById("detailTitle").textContent = item.title || item.department || "";
+      document.getElementById("detailTitle").style.color = item.color || "#00B7C6";
+      document.getElementById("detailDesc").textContent = item.description || "";
+      document.getElementById("detailStatus").textContent = item.status || "-";
+      document.getElementById("detailProgress").textContent = (item.progress || 0) + "%";
+      document.getElementById("detailTimeline").textContent = item.timeline || "-";
+      document.getElementById("detailBudget").textContent = item.budget || "N/A";
+      document.getElementById("detailUtilization").textContent = item.utilization || "N/A";
+      document.getElementById("detailAccomplishment").textContent = item.accomplishment || "-";
+      document.getElementById("detailRemarks").textContent = item.remarks || "-";
+    }
+
+    function setHoverState(index, isHovering) {
+      const target = document.querySelector('.segment-path[data-index="' + index + '"]');
+      if (!target) return;
+      if (isHovering) target.classList.add("active");
+      else if (!target.classList.contains("selected")) target.classList.remove("active");
+    }
+
+    function describeDonutSegment(cx, cy, rInner, rOuter, startAngle, endAngle) {
+      const gap = 3.4;
+      const adjustedStart = startAngle + gap;
+      const adjustedEnd = endAngle - gap;
+      const startOuter = polarToCartesian(cx, cy, rOuter, adjustedEnd);
+      const endOuter = polarToCartesian(cx, cy, rOuter, adjustedStart);
+      const startInner = polarToCartesian(cx, cy, rInner, adjustedStart);
+      const endInner = polarToCartesian(cx, cy, rInner, adjustedEnd);
+      const largeArcFlag = adjustedEnd - adjustedStart <= 180 ? "0" : "1";
+      return ["M", startOuter.x, startOuter.y, "A", rOuter, rOuter, 0, largeArcFlag, 0, endOuter.x, endOuter.y, "L", startInner.x, startInner.y, "A", rInner, rInner, 0, largeArcFlag, 1, endInner.x, endInner.y, "Z"].join(" ");
+    }
+
+    function polarToCartesian(cx, cy, radius, angleInDegrees) {
+      const angleInRadians = (angleInDegrees - 90) * Math.PI / 180.0;
+      return { x: cx + radius * Math.cos(angleInRadians), y: cy + radius * Math.sin(angleInRadians) };
+    }
+
+    function createSvgElement(tag, attrs) {
+      const element = document.createElementNS(SVG_NS, tag);
+      Object.keys(attrs).forEach(key => element.setAttribute(key, attrs[key]));
+      return element;
+    }
+
+    function parseCSV(text) {
+      const rows = [];
+      let row = [];
+      let cell = "";
+      let insideQuotes = false;
+      for (let i = 0; i < text.length; i++) {
+        const char = text[i];
+        const nextChar = text[i + 1];
+        if (char === '"' && insideQuotes && nextChar === '"') { cell += '"'; i++; }
+        else if (char === '"') insideQuotes = !insideQuotes;
+        else if (char === "," && !insideQuotes) { row.push(cell); cell = ""; }
+        else if ((char === "\n" || char === "\r") && !insideQuotes) {
+          if (char === "\r" && nextChar === "\n") i++;
+          row.push(cell); rows.push(row); row = []; cell = "";
+        } else cell += char;
+      }
+      if (cell || row.length) { row.push(cell); rows.push(row); }
+      return rows;
+    }
+
+    function summarizeStatus(items) {
+      const statuses = items.map(item => String(item.status || "").toLowerCase());
+      if (statuses.some(s => s.includes("ongoing") || s.includes("in progress"))) return "Ongoing";
+      if (statuses.some(s => s.includes("completed") || s.includes("done"))) return "Completed";
+      if (statuses.some(s => s.includes("delayed"))) return "Delayed";
+      if (statuses.some(s => s.includes("pending"))) return "Pending";
+      if (statuses.some(s => s.includes("monitor"))) return "For Monitoring";
+      if (statuses.some(s => s.includes("updating"))) return "For Updating";
+      return items[0]?.status || "For Updating";
+    }
+
+    function uniqueJoin(items) {
+      const clean = items.map(v => String(v || "").trim()).filter(v => v && v.toLowerCase() !== "n/a");
+      return [...new Set(clean)].slice(0, 3).join(", ");
+    }
+
+    function normalizeHeader(value) {
+      return String(value || "").trim().toLowerCase().replace(/\s+/g, " ");
+    }
+
+    function getCell(row, headers, possibleHeaders) {
+      for (let i = 0; i < possibleHeaders.length; i++) {
+        const index = headers.indexOf(normalizeHeader(possibleHeaders[i]));
+        if (index !== -1) return row[index] || "";
+      }
+      return "";
+    }
+
+    function parseProgress(value) {
+      if (value === "" || value === null || value === undefined) return 0;
+      const number = parseFloat(String(value).replace("%", "").trim());
+      if (isNaN(number)) return 0;
+      if (number <= 1) return Math.round(number * 100);
+      return Math.max(0, Math.min(100, Math.round(number)));
+    }
+
+    function lightenColor(hex, percent) {
+      hex = String(hex || "#00B7C6").replace("#", "");
+      if (hex.length === 3) hex = hex.split("").map(char => char + char).join("");
+      const number = parseInt(hex, 16);
+      let r = (number >> 16) + percent;
+      let g = ((number >> 8) & 0x00ff) + percent;
+      let b = (number & 0x0000ff) + percent;
+      r = Math.max(0, Math.min(255, r));
+      g = Math.max(0, Math.min(255, g));
+      b = Math.max(0, Math.min(255, b));
+      return "#" + (b | (g << 8) | (r << 16)).toString(16).padStart(6, "0");
+    }
+
+    function cacheBuster() {
+      return SHEET_CSV_URL.includes("?") ? "&v=" + Date.now() : "?v=" + Date.now();
+    }
+
+    function setMessage(text) {
+      const box = document.getElementById("message");
+      if (!text) { box.style.display = "none"; box.textContent = ""; return; }
+      box.style.display = "block";
+      box.textContent = text;
+    }
+
+    function escapeHtml(value) {
+      return String(value || "")
+        .replaceAll("&", "&amp;")
+        .replaceAll("<", "&lt;")
+        .replaceAll(">", "&gt;")
+        .replaceAll('"', "&quot;")
+        .replaceAll("'", "&#039;");
+    }
+  </script>
+</body>
+</html>

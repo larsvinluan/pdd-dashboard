@@ -1,7 +1,6 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <base target="_top">
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>OPSD Budget Summary Dashboard</title>
@@ -1052,7 +1051,7 @@
     function requestDashboardData(forceRefresh) {
       return new Promise(function(resolve, reject) {
         if (!GAS_WEB_APP_URL || GAS_WEB_APP_URL.indexOf('PASTE_YOUR_DEPLOYED') >= 0) {
-          reject(new Error('Please replace GAS_WEB_APP_URL with your deployed Apps Script Web App URL.'));
+          reject(new Error('Please replace GAS_WEB_APP_URL with your deployed Apps Script Web App URL ending in /exec.'));
           return;
         }
 
@@ -1067,16 +1066,19 @@
         });
 
         const separator = GAS_WEB_APP_URL.indexOf('?') >= 0 ? '&' : '?';
+
         const timeout = setTimeout(function() {
           cleanup();
-          reject(new Error('Dashboard data request timed out. Please check the Apps Script Web App URL and deployment access.'));
+          reject(new Error('Dashboard data request timed out. Please check Apps Script deployment access, Web App URL, and cache.'));
         }, 60000);
 
         function cleanup() {
           clearTimeout(timeout);
+
           if (script.parentNode) {
             script.parentNode.removeChild(script);
           }
+
           try {
             delete window[callbackName];
           } catch (err) {
@@ -1097,7 +1099,7 @@
 
         script.onerror = function() {
           cleanup();
-          reject(new Error('Unable to load dashboard data from Apps Script Web App.'));
+          reject(new Error('Unable to load dashboard data from Apps Script Web App. Use /exec URL and set access to Anyone.'));
         };
 
         script.src = GAS_WEB_APP_URL + separator + params.toString();

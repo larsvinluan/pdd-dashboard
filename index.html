@@ -1,985 +1,1809 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Programs and Development Division Projects</title>
+  <base target="_top">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>OPSD Budget Summary Dashboard</title>
 
-  
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
   <style>
     :root {
-      --navy: #071b3a;
-      --navy-soft: #102c58;
-      --text: #1e293b;
-      --muted: #64748b;
-      --line: rgba(226, 232, 240, 0.95);
-      --glass: rgba(255, 255, 255, 0.78);
-      --white: #ffffff;
-      --cyan: #00c7d7;
-      --blue: #149dff;
-      --purple: #9b35e5;
-      --pink: #ff2f92;
-      --orange: #ff7a18;
-      --yellow: #ffd21a;
-      --green: #65e833;
-      --shadow: 0 28px 80px rgba(15, 23, 42, 0.18);
+      --bg: #041126;
+      --panel: rgba(5, 22, 53, 0.94);
+      --blue: #0d6efd;
+      --blue2: #00a6ff;
+      --cyan: #34dfff;
+      --green: #15c95f;
+      --orange: #f6a600;
+      --purple: #8b43ff;
+      --red: #ef3f5f;
+      --text: #ffffff;
+      --muted: #b9d7ff;
+      --glow: 0 0 18px rgba(0, 166, 255, 0.35);
+      --shadow: 0 14px 30px rgba(0, 0, 0, 0.35);
     }
 
-    * { box-sizing: border-box; }
-    html { scroll-behavior: smooth; }
+    * {
+      box-sizing: border-box;
+    }
 
     body {
       margin: 0;
-      min-height: 100vh;
-      font-family: Arial, Helvetica, sans-serif;
+      font-family: "Segoe UI", Arial, sans-serif;
       color: var(--text);
       background:
-        radial-gradient(circle at 8% 86%, rgba(0, 199, 215, 0.30), transparent 26%),
-        radial-gradient(circle at 92% 72%, rgba(155, 53, 229, 0.16), transparent 28%),
-        linear-gradient(135deg, #f7fbff 0%, #edf4fb 45%, #fbfdff 100%);
+        radial-gradient(circle at 12% 8%, rgba(0, 166, 255, 0.22), transparent 24%),
+        radial-gradient(circle at 88% 12%, rgba(48, 154, 255, 0.18), transparent 24%),
+        linear-gradient(135deg, #020a19 0%, #041126 46%, #082b63 100%);
+      min-height: 100vh;
       overflow-x: hidden;
     }
 
+    body::before {
+      content: "";
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      background-image:
+        linear-gradient(rgba(52, 223, 255, 0.06) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(52, 223, 255, 0.06) 1px, transparent 1px);
+      background-size: 32px 32px;
+      opacity: 0.5;
+      z-index: 0;
+    }
+
     .page {
-      width: min(1420px, calc(100% - 20px));
-      min-height: calc(100vh - 20px);
-      margin: 10px auto;
+      position: relative;
+      z-index: 1;
+      width: 100%;
+      max-width: none;
+      margin: 0;
+      padding: 8px 10px;
+    }
+
+    .hero-wrap {
       position: relative;
       overflow: hidden;
-      border-radius: 34px;
-      border: 1px solid rgba(226, 232, 240, 0.95);
+      border-radius: 14px;
       background:
-        linear-gradient(135deg, rgba(255, 255, 255, 0.98), rgba(255, 255, 255, 0.90)),
-        radial-gradient(circle at 58% 28%, rgba(0, 199, 215, 0.13), transparent 30%),
-        radial-gradient(circle at 86% 70%, rgba(247, 37, 133, 0.12), transparent 30%);
-      box-shadow: var(--shadow);
-      padding: 30px 42px 32px;
+        radial-gradient(circle at 9% 40%, rgba(52, 223, 255, 0.19), transparent 20%),
+        radial-gradient(circle at 43% 100%, rgba(0, 166, 255, 0.32), transparent 22%),
+        radial-gradient(circle at 84% 20%, rgba(0, 94, 255, 0.22), transparent 30%),
+        linear-gradient(120deg, #02081d 0%, #03123a 34%, #041f58 68%, #020a24 100%);
+      border: 1px solid rgba(52, 223, 255, 0.48);
+      box-shadow:
+        0 18px 38px rgba(0, 0, 0, 0.42),
+        0 0 28px rgba(0, 166, 255, 0.32),
+        inset 0 0 0 1px rgba(255,255,255,0.04);
     }
 
-    .page::before {
+    .hero-wrap::before {
       content: "";
       position: absolute;
-      width: 690px;
-      height: 690px;
-      right: -280px;
-      top: -260px;
-      border-radius: 50%;
-      background: rgba(15, 27, 49, 0.035);
-      z-index: 0;
-    }
-
-    .page::after {
-      content: "";
-      position: absolute;
-      width: 820px;
-      height: 820px;
-      left: -390px;
-      bottom: -315px;
-      border-radius: 50%;
-      background: rgba(0, 199, 215, 0.11);
-      z-index: 0;
-    }
-
-    .decor-lines {
-      position: absolute;
-      right: -155px;
-      top: 102px;
-      width: 560px;
-      height: 560px;
-      border-radius: 50%;
-      border: 1px solid rgba(15, 27, 49, 0.07);
-      z-index: 0;
+      inset: 0;
+      background:
+        linear-gradient(128deg, transparent 0%, transparent 15%, rgba(12, 92, 210, 0.22) 15.5%, transparent 27%),
+        linear-gradient(128deg, transparent 0%, transparent 29%, rgba(0, 166, 255, 0.18) 29.5%, transparent 43%),
+        linear-gradient(128deg, transparent 0%, transparent 48%, rgba(52, 223, 255, 0.15) 48.5%, transparent 62%),
+        linear-gradient(128deg, transparent 0%, transparent 80%, rgba(0, 166, 255, 0.15) 80.5%, transparent 92%);
+      opacity: 0.95;
       pointer-events: none;
     }
 
-    .decor-lines::before,
-    .decor-lines::after {
+    .hero-wrap::after {
       content: "";
       position: absolute;
-      border-radius: 50%;
-      border: 1px solid rgba(15, 27, 49, 0.055);
+      inset: 0;
+      background:
+        radial-gradient(circle at 51% 36%, rgba(52, 223, 255, 0.15) 0 1px, transparent 2px),
+        radial-gradient(circle at 91% 22%, rgba(52, 223, 255, 0.20) 0 1px, transparent 2px),
+        linear-gradient(90deg, transparent 0%, rgba(52, 223, 255, 0.14) 52%, transparent 100%);
+      background-size: 16px 16px, 16px 16px, 100% 100%;
+      mask-image: linear-gradient(90deg, transparent 0%, black 32%, black 100%);
+      opacity: 0.46;
+      pointer-events: none;
     }
 
-    .decor-lines::before { inset: 34px; }
-    .decor-lines::after { inset: 68px; }
-
-    .dot-pattern {
+    .hero-glow-line {
       position: absolute;
-      width: 170px;
-      height: 170px;
-      left: 120px;
-      top: 260px;
-      opacity: 0.22;
-      z-index: 0;
-      background-image: radial-gradient(circle, #149dff 2px, transparent 2px);
-      background-size: 15px 15px;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      height: 4px;
+      background:
+        linear-gradient(90deg, transparent 0%, rgba(0,166,255,0.15) 18%, rgba(52,223,255,0.92) 43%, rgba(0,166,255,0.72) 62%, transparent 100%);
+      box-shadow:
+        0 0 14px rgba(52, 223, 255, 0.85),
+        0 -8px 24px rgba(0, 166, 255, 0.35);
+      z-index: 2;
+      pointer-events: none;
     }
 
-    .topbar {
-      position: relative;
-      z-index: 5;
-      display: grid;
-      grid-template-columns: 1fr auto;
-      gap: 22px;
-      align-items: start;
-    }
-
-    .main-title {
-      margin: 0;
-      color: var(--navy);
-      font-size: clamp(30px, 4.4vw, 58px);
-      line-height: 0.94;
-      font-weight: 950;
-      letter-spacing: -1.5px;
-      text-transform: uppercase;
-    }
-
-    .title-gradient {
-      display: inline-block;
-      margin-top: 4px;
-      font-size: clamp(50px, 7vw, 88px);
-      letter-spacing: -2.5px;
-      background: linear-gradient(90deg, #149dff 0%, #8a35e5 42%, #f72585 70%, #ffb000 100%);
-      -webkit-background-clip: text;
-      background-clip: text;
-      color: transparent;
-      filter: drop-shadow(0 6px 16px rgba(20, 157, 255, 0.18));
-    }
-
-    .title-line {
-      width: 290px;
-      height: 7px;
-      margin-top: 14px;
-      border-radius: 999px;
-      background: linear-gradient(90deg, #149dff, #8a35e5, #f72585, #ff9f00, #59d12f, #149dff);
-      position: relative;
-      box-shadow: 0 0 20px rgba(20, 157, 255, 0.32);
-    }
-
-    .title-line::before,
-    .title-line::after {
-      content: "";
-      position: absolute;
-      top: 50%;
-      width: 9px;
-      height: 9px;
-      transform: translateY(-50%);
-      border-radius: 50%;
-      background: #149dff;
-    }
-
-    .title-line::before { left: 0; }
-    .title-line::after { right: 0; }
-
-    .mode-pill {
-      display: inline-flex;
-      align-items: center;
-      gap: 11px;
-      padding: 15px 20px;
-      border-radius: 999px;
-      background: rgba(255, 255, 255, 0.92);
-      color: #08798c;
-      border: 1px solid rgba(184, 243, 247, 0.95);
-      font-size: 15px;
-      font-weight: 950;
-      letter-spacing: 0.7px;
-      text-transform: uppercase;
-      white-space: nowrap;
-      box-shadow: 0 14px 32px rgba(15, 23, 42, 0.10);
-      backdrop-filter: blur(14px);
-    }
-
-    .mode-dot {
-      width: 12px;
-      height: 12px;
-      border-radius: 50%;
-      background: #11b7bd;
-      box-shadow: 0 0 0 7px rgba(17, 183, 189, 0.16);
-    }
-
-    .date-text {
-      display: block;
-      margin-top: 4px;
-      color: #64748b;
-      font-size: 11px;
-      font-weight: 700;
-      text-transform: none;
-      letter-spacing: 0;
-    }
-
-    .message {
-      position: relative;
-      z-index: 6;
-      display: none;
-      margin-top: 14px;
-      padding: 12px 14px;
-      border-radius: 14px;
-      background: #fff7ed;
-      color: #9a3412;
-      border: 1px solid #fed7aa;
-      font-size: 14px;
-      font-weight: 700;
-    }
-
-    .infographic-area {
+    .hero {
       position: relative;
       z-index: 2;
-      width: 100%;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      margin-top: -140px;
-      pointer-events: none;
+      padding: 16px 26px 16px;
+      min-height: 108px;
     }
 
-    .wheel-box {
-      width: min(960px, 100%);
-      aspect-ratio: 1 / 1;
-      position: relative;
-      pointer-events: auto;
-    }
-
-    svg {
-      width: 100%;
-      height: 100%;
-      display: block;
-      overflow: visible;
-    }
-
-    .segment-path {
-      cursor: pointer;
-      transition: transform 0.22s ease, filter 0.22s ease;
-      transform-box: fill-box;
-      transform-origin: center;
-      stroke: #ffffff;
-      stroke-width: 9;
-      stroke-linejoin: round;
-      filter:
-        drop-shadow(0 17px 11px rgba(15, 23, 42, 0.28))
-        drop-shadow(0 0 15px rgba(255, 255, 255, 0.50));
-    }
-
-    .segment-path:hover,
-    .segment-path.active {
-      transform: scale(1.03);
-      filter:
-        drop-shadow(0 25px 18px rgba(15, 23, 42, 0.35))
-        drop-shadow(0 0 28px rgba(255, 255, 255, 0.96));
-    }
-
-    .segment-hit {
-      cursor: pointer;
-      fill: transparent;
-      stroke: transparent;
-      stroke-width: 0;
-      pointer-events: all;
-    }
-
-    .segment-highlight {
-      pointer-events: none;
-      opacity: 0.38;
-      mix-blend-mode: screen;
-    }
-
-    .label-object { pointer-events: none; }
-
-    .segment-label {
-      pointer-events: none;
-      color: #ffffff;
-      text-align: center;
-      text-shadow:
-        0 3px 8px rgba(0, 0, 0, 0.34),
-        0 0 14px rgba(255, 255, 255, 0.25);
-      font-family: Arial, Helvetica, sans-serif;
-    }
-
-    .segment-label .icon {
-      font-size: 43px;
-      line-height: 1;
-      margin-bottom: 8px;
-      font-weight: 900;
-    }
-
-    .segment-label .title {
-      font-size: 18px;
-      line-height: 1.06;
-      font-weight: 950;
-      letter-spacing: 0.5px;
-      text-transform: uppercase;
-    }
-
-    .segment-label .rule {
-      width: 128px;
-      height: 2px;
-      background: rgba(255, 255, 255, 0.90);
-      margin: 10px auto 9px;
-    }
-
-    .segment-label .desc {
-      font-size: 11.5px;
-      line-height: 1.32;
-      font-weight: 700;
-      opacity: 0.96;
-      max-width: 150px;
-      margin: 0 auto;
-    }
-
-    .center-circle,
-    .center-logo-wrap { pointer-events: none; }
-
-    .center-circle {
-      filter:
-        drop-shadow(0 18px 22px rgba(15, 23, 42, 0.30))
-        drop-shadow(0 0 22px rgba(0, 199, 215, 0.30));
-    }
-
-    .center-logo-wrap {
-      filter:
-        drop-shadow(0 14px 22px rgba(15, 23, 42, 0.28))
-        drop-shadow(0 0 18px rgba(255, 255, 255, 0.84));
-    }
-
-    .details-panel {
-      position: relative;
-      z-index: 8;
-      margin: -28px auto 0;
-      width: min(1260px, 100%);
-      background: linear-gradient(135deg, rgba(255, 255, 255, 0.98), rgba(255, 255, 255, 0.92));
-      border: 1px solid rgba(226, 232, 240, 0.95);
-      border-radius: 26px;
-      box-shadow: 0 22px 52px rgba(15, 23, 42, 0.14);
-      padding: 20px 26px;
+    .hero-inner {
       display: grid;
-      grid-template-columns: 116px 1fr;
-      gap: 19px;
+      grid-template-columns: minmax(0, 1fr) auto;
+      gap: 18px;
       align-items: center;
-      backdrop-filter: blur(16px);
     }
 
-    .detail-icon {
-      width: 98px;
-      height: 98px;
-      border-radius: 50%;
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 18px;
+      min-width: 0;
+    }
+
+    .main-logo {
+      width: 88px;
+      height: 88px;
+      background: transparent;
       display: grid;
       place-items: center;
-      color: #ffffff;
-      font-size: 44px;
-      font-weight: 900;
-      box-shadow:
-        0 17px 32px rgba(15, 23, 42, 0.25),
-        inset 0 0 0 1px rgba(255, 255, 255, 0.30);
+      flex-shrink: 0;
+      overflow: visible;
+      padding: 0;
+      filter:
+        drop-shadow(0 0 10px rgba(52, 223, 255, 0.42))
+        drop-shadow(0 8px 12px rgba(0, 0, 0, 0.35));
     }
 
-    .detail-title {
+    .main-logo img {
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+      display: block;
+      border: none;
+      background: transparent;
+      box-shadow: none;
+    }
+
+    .logo-fallback {
+      display: none;
+      color: white;
+      font-weight: 700;
+      font-size: 14px;
+      text-align: center;
+      line-height: 1.15;
+    }
+
+    .hero-title-block {
+      min-width: 0;
+    }
+
+    .hero h1 {
       margin: 0;
-      font-size: 24px;
-      color: #0097a7;
-      font-weight: 950;
-      letter-spacing: 1px;
-      text-transform: uppercase;
+      font-size: clamp(28px, 3vw, 40px);
+      line-height: 1;
+      letter-spacing: -0.8px;
+      color: #ffffff;
+      text-shadow:
+        0 3px 12px rgba(0,0,0,0.52),
+        0 0 12px rgba(255,255,255,0.16);
+      white-space: nowrap;
+      font-weight: 900;
     }
 
-    .detail-desc {
-      margin: 7px 0 13px;
-      color: #475569;
-      line-height: 1.4;
+    .eyebrow {
+      margin-top: 9px;
       font-size: 16px;
-      font-weight: 600;
+      font-weight: 800;
+      color: var(--cyan);
+      text-shadow: 0 0 12px rgba(52, 223, 255, 0.70);
+      white-space: nowrap;
     }
 
-    .detail-grid {
+    .hero-cards {
+      display: grid;
+      grid-template-columns: repeat(3, 185px);
+      gap: 10px;
+    }
+
+    .hero-mini {
+      min-height: 76px;
+      background:
+        radial-gradient(circle at 18% 50%, rgba(52, 223, 255, 0.12), transparent 34%),
+        linear-gradient(135deg, rgba(2, 10, 31, 0.92), rgba(2, 19, 55, 0.96));
+      border: 1px solid rgba(0, 166, 255, 0.72);
+      border-radius: 9px;
+      padding: 12px 14px;
+      display: grid;
+      grid-template-columns: 38px 1fr;
+      align-items: center;
+      column-gap: 13px;
+      text-align: left;
+      box-shadow:
+        0 0 16px rgba(13, 110, 253, 0.35),
+        inset 0 0 0 1px rgba(255,255,255,0.025);
+      backdrop-filter: blur(8px);
+    }
+
+    .hero-card-icon {
+      width: 34px;
+      height: 34px;
+      display: grid;
+      place-items: center;
+      color: #39cfff;
+      filter: drop-shadow(0 0 7px rgba(52, 223, 255, 0.80));
+      font-size: 28px;
+    }
+
+    .hero-card-text {
+      min-width: 0;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: flex-start;
+    }
+
+    .hero-mini span {
+      display: block;
+      color: var(--cyan);
+      font-size: 10px;
+      text-transform: uppercase;
+      font-weight: 900;
+      margin-bottom: 6px;
+      letter-spacing: 0.45px;
+      line-height: 1;
+      white-space: nowrap;
+    }
+
+    .hero-mini strong {
+      display: block;
+      color: #ffffff;
+      font-size: 12px;
+      line-height: 1.25;
+      font-weight: 800;
+      white-space: nowrap;
+    }
+
+    .hero-mini strong .line {
+      display: block;
+      white-space: nowrap;
+    }
+
+    .hero-mini strong,
+    .hero-mini strong span,
+    .hero-mini strong .line,
+    .hero-mini #lastUpdated,
+    .hero-mini #lastUpdated span,
+    .hero-mini #lastUpdated .line {
+      color: #ffffff !important;
+    }
+
+    .filters {
+      position: relative;
+      z-index: 2;
+      display: grid;
+      grid-template-columns: 1fr 1fr 1.15fr 140px;
+      gap: 14px;
+      padding: 12px 26px 14px;
+      background: rgba(2, 12, 32, 0.46);
+      border-top: 1px solid rgba(52, 223, 255, 0.20);
+    }
+
+    .filter-field {
+      min-width: 0;
+    }
+
+    .filter-field label {
+      display: block;
+      color: #98dfff;
+      font-size: 10px;
+      font-weight: 500;
+      margin-bottom: 6px;
+    }
+
+    .filter-control {
+      height: 34px;
+      width: 100%;
+      border-radius: 6px;
+      background: rgba(3, 13, 35, 0.84);
+      border: 1px solid rgba(52, 223, 255, 0.34);
+      color: #ffffff;
+      padding: 0 12px;
+      outline: none;
+      font-size: 12px;
+      font-weight: 400;
+      box-shadow: inset 0 0 0 1px rgba(255,255,255,0.02);
+    }
+
+    select.filter-control {
+      appearance: none;
+      background-image:
+        linear-gradient(45deg, transparent 50%, #b9d7ff 50%),
+        linear-gradient(135deg, #b9d7ff 50%, transparent 50%);
+      background-position:
+        calc(100% - 17px) 14px,
+        calc(100% - 11px) 14px;
+      background-size: 6px 6px, 6px 6px;
+      background-repeat: no-repeat;
+    }
+
+    .filter-button {
+      align-self: end;
+      height: 34px;
+      border-radius: 7px;
+      border: 1px solid rgba(52, 223, 255, 0.55);
+      background: rgba(4, 18, 45, 0.88);
+      color: var(--cyan);
+      font-size: 12px;
+      font-weight: 900;
+      cursor: pointer;
+      letter-spacing: 0.5px;
+      box-shadow: 0 0 15px rgba(0, 166, 255, 0.26);
+    }
+
+    .filter-button:hover {
+      background: linear-gradient(135deg, #0056d9, #00a6ff);
+      color: #ffffff;
+    }
+
+    .kpis {
       display: grid;
       grid-template-columns: repeat(5, 1fr);
-      gap: 12px;
-      margin-bottom: 12px;
+      gap: 10px;
+      margin: 8px 0;
     }
 
-    .detail-card {
-      min-height: 62px;
-      padding: 12px 14px;
-      border: 1px solid var(--line);
-      border-radius: 14px;
-      background: rgba(255, 255, 255, 0.94);
-      box-shadow: 0 5px 14px rgba(15, 23, 42, 0.05);
-    }
-
-    .detail-label {
-      color: #64748b;
-      font-size: 10px;
-      font-weight: 900;
-      margin-bottom: 5px;
-      text-transform: uppercase;
-      letter-spacing: 0.4px;
-    }
-
-    .detail-value {
-      color: var(--navy);
-      font-size: 15px;
-      font-weight: 950;
-      line-height: 1.25;
-    }
-
-    .wide-grid {
+    .kpi {
+      position: relative;
+      overflow: hidden;
+      min-height: 100px;
+      border-radius: 10px;
+      padding: 13px 14px;
+      border: 1px solid rgba(255,255,255,0.12);
+      box-shadow: 0 14px 25px rgba(0,0,0,0.25);
       display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 12px;
+      grid-template-columns: 48px 1fr;
+      gap: 10px;
+      align-items: center;
+      color: #ffffff;
     }
 
-    .wide-card {
-      padding: 12px 14px;
-      border: 1px solid var(--line);
-      border-radius: 14px;
-      background: rgba(255, 255, 255, 0.94);
-      box-shadow: 0 5px 14px rgba(15, 23, 42, 0.05);
+    .kpi:nth-child(1) {
+      background: linear-gradient(135deg, rgba(0, 83, 200, 0.98), rgba(0, 130, 255, 0.78));
+      border-color: rgba(52, 223, 255, 0.55);
     }
 
-    .hint {
-      margin-top: 12px;
-      text-align: center;
-      color: #475569;
-      font-size: 14px;
+    .kpi.green {
+      background: linear-gradient(135deg, rgba(0, 102, 45, 0.98), rgba(0, 214, 107, 0.70));
+      border-color: rgba(0, 214, 107, 0.55);
+    }
+
+    .kpi.orange {
+      background: linear-gradient(135deg, rgba(143, 81, 0, 0.98), rgba(255, 176, 0, 0.78));
+      border-color: rgba(255, 176, 0, 0.60);
+    }
+
+    .kpi.purple {
+      background: linear-gradient(135deg, rgba(68, 24, 146, 0.98), rgba(155, 92, 255, 0.78));
+      border-color: rgba(155, 92, 255, 0.60);
+    }
+
+    .kpi.red {
+      background: linear-gradient(135deg, rgba(126, 20, 44, 0.98), rgba(255, 77, 109, 0.78));
+      border-color: rgba(255, 77, 109, 0.60);
+    }
+
+    .kpi::after {
+      content: "";
+      position: absolute;
+      right: -42px;
+      top: -54px;
+      width: 118px;
+      height: 118px;
+      border-radius: 50%;
+      background: rgba(255,255,255,0.13);
+      pointer-events: none;
+    }
+
+    .logo-badge {
+      width: 48px;
+      height: 48px;
+      border-radius: 50%;
+      color: #ffffff !important;
+      background: rgba(255,255,255,0.16) !important;
+      border: 1px solid rgba(255,255,255,0.20);
+      font-size: 24px;
+      display: grid;
+      place-items: center;
+      box-shadow: inset 0 0 0 1px rgba(255,255,255,0.05), 0 0 12px rgba(255,255,255,0.14);
+    }
+
+    .kpi .label {
+      margin: 0;
+      color: rgba(255,255,255,0.94);
+      text-transform: uppercase;
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 0.3px;
+    }
+
+    .kpi .value {
+      margin-top: 7px;
+      font-size: 26px;
+      line-height: 1;
+      font-weight: 900;
+      letter-spacing: -0.6px;
+      color: #ffffff;
+      text-shadow: 0 3px 9px rgba(0,0,0,0.35);
+    }
+
+    .kpi .note {
+      margin-top: 7px;
+      color: rgba(255,255,255,0.86);
+      font-size: 11px;
+      font-weight: 400;
+    }
+
+    .grid-main {
+      display: grid;
+      grid-template-columns: 1.3fr 1fr;
+      gap: 8px;
+      margin-bottom: 8px;
+    }
+
+    .panel {
+      background: rgba(5, 22, 53, 0.92);
+      border: 1px solid rgba(52, 223, 255, 0.32);
+      border-radius: 10px;
+      box-shadow: 0 14px 25px rgba(0,0,0,0.25), inset 0 0 0 1px rgba(255,255,255,0.02);
+      padding: 10px;
+      overflow: hidden;
+    }
+
+    .panel-title {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 8px;
+    }
+
+    .panel-title .logo-badge {
+      width: 30px;
+      height: 30px;
+      border-radius: 7px;
+      font-size: 15px;
+      background: rgba(0, 166, 255, 0.16) !important;
+      color: var(--cyan) !important;
+      border: 1px solid rgba(52, 223, 255, 0.25);
+    }
+
+    .panel-title h2 {
+      margin: 0;
+      font-size: 16px;
+      line-height: 1.1;
+      color: #ffffff;
+      font-weight: 800;
+      text-shadow: 0 2px 8px rgba(0,0,0,0.35);
+    }
+
+    .panel-title .tag {
+      margin-left: auto;
+      border: 1px solid rgba(52, 223, 255, 0.24);
+      background: rgba(0, 166, 255, 0.12);
+      color: var(--cyan);
+      border-radius: 999px;
+      padding: 5px 8px;
+      font-size: 10px;
       font-weight: 700;
     }
 
-    .actions {
-      position: relative;
-      z-index: 9;
-      display: flex;
-      justify-content: center;
-      gap: 10px;
-      flex-wrap: wrap;
-      margin-top: 16px;
+    .chart-box {
+      height: 185px;
+      background: rgba(2, 12, 32, 0.56);
+      border-radius: 9px;
+      padding: 8px;
+      border: 1px solid rgba(52, 223, 255, 0.18);
+      box-shadow: inset 0 0 20px rgba(52,223,255,0.06);
     }
 
-    button {
-      cursor: pointer;
-      border: 0;
-      border-radius: 999px;
-      padding: 11px 20px;
-      background: linear-gradient(90deg, #149dff, #8a35e5, #f72585, #ff9f00);
+    .table-panel {
+      margin-top: 8px;
+    }
+
+    .expense-filter-bar {
+      display: grid;
+      grid-template-columns: 1.45fr 1fr 0.7fr 0.8fr 140px;
+      gap: 12px;
+      margin: 10px 0 10px;
+      padding: 9px;
+      border-radius: 9px;
+      background: rgba(2, 12, 32, 0.58);
+      border: 1px solid rgba(52, 223, 255, 0.22);
+      box-shadow: inset 0 0 20px rgba(52,223,255,0.04);
+    }
+
+    .expense-filter-input,
+    .expense-filter-select,
+    .expense-refresh-button {
+      height: 42px;
+      border-radius: 8px;
+      border: 1px solid rgba(70, 143, 255, 0.62);
+      background: rgba(2, 10, 31, 0.94);
       color: #ffffff;
-      font-weight: 950;
-      letter-spacing: 0.4px;
-      box-shadow: 0 10px 25px rgba(15, 23, 42, 0.18);
-      transition: 0.2s ease;
+      outline: none;
+      font-size: 13px;
+      font-weight: 500;
     }
 
-    button:hover {
-      transform: translateY(-1px);
-      filter: brightness(1.04);
+    .expense-filter-input {
+      padding: 0 14px;
     }
 
-    .ghost-btn {
-      background: rgba(255, 255, 255, 0.88);
-      color: var(--navy);
-      border: 1px solid var(--line);
+    .expense-filter-input::placeholder {
+      color: rgba(255,255,255,0.50);
     }
 
-    @media (max-width: 1120px) {
-      .infographic-area { margin-top: -50px; }
-      .details-panel { margin-top: -8px; }
+    .expense-filter-select {
+      padding: 0 12px;
     }
 
-    @media (max-width: 900px) {
-      .page { padding: 20px 14px 24px; }
-      .topbar { grid-template-columns: 1fr; }
-      .infographic-area { margin-top: 8px; }
-      .wheel-box { width: 100%; }
-      .segment-label .icon { font-size: 28px; margin-bottom: 5px; }
-      .segment-label .title { font-size: 12px; }
-      .segment-label .rule { width: 82px; margin: 7px auto; }
-      .segment-label .desc { font-size: 9px; max-width: 110px; }
-      .details-panel { grid-template-columns: 1fr; text-align: center; }
-      .detail-icon { margin: 0 auto; }
-      .detail-grid { grid-template-columns: repeat(2, 1fr); }
-      .wide-grid { grid-template-columns: 1fr; }
+    .expense-refresh-button {
+      cursor: pointer;
+      font-weight: 900;
+      background: linear-gradient(135deg, #176bff, #2d7dff);
+      border-color: rgba(52, 223, 255, 0.56);
+      box-shadow: 0 8px 20px rgba(13, 110, 253, 0.35);
     }
 
-    @media (max-width: 560px) {
-      .main-title { font-size: 28px; }
-      .title-gradient { font-size: 42px; }
-      .segment-label .desc,
-      .segment-label .rule { display: none; }
-      .segment-label .title { font-size: 8px; }
-      .segment-label .icon { font-size: 19px; }
-      .detail-grid { grid-template-columns: 1fr; }
+    .expense-refresh-button:hover {
+      background: linear-gradient(135deg, #0056d9, #00a6ff);
+    }
+
+    table {
+      width: 100%;
+      border-collapse: separate;
+      border-spacing: 0;
+      overflow: hidden;
+      border-radius: 8px;
+      font-size: 11px;
+      border: 1px solid rgba(52, 223, 255, 0.22);
+    }
+
+    th {
+      background: linear-gradient(135deg, #004fc7, #0d86ff);
+      color: #ffffff;
+      text-align: center;
+      font-size: 10px;
+      text-transform: uppercase;
+      letter-spacing: 0.3px;
+      padding: 8px 7px;
+      border-right: 1px solid rgba(255,255,255,0.16);
+      vertical-align: middle;
+      font-weight: 800;
+    }
+
+    td {
+      background: rgba(6, 25, 60, 0.92);
+      border-bottom: 1px solid rgba(52, 223, 255, 0.18);
+      border-right: 1px solid rgba(52, 223, 255, 0.13);
+      padding: 7px 7px;
+      font-weight: 400;
+      color: #f0f7ff;
+      text-align: center;
+      vertical-align: middle;
+      line-height: 1.2;
+    }
+
+    tr:nth-child(even) td {
+      background: rgba(4, 18, 45, 0.96);
+    }
+
+    tbody tr:hover td {
+      background: rgba(12, 57, 113, 0.65);
+    }
+
+    tfoot td {
+      background: rgba(0, 214, 107, 0.15) !important;
+      color: #ffffff;
+      font-weight: 600;
+      text-align: center;
+      vertical-align: middle;
+      border-top: 1px solid rgba(0, 214, 107, 0.38);
+    }
+
+    .allocation-ok { color: #37f08a; font-weight: 800; }
+    .allocation-near { color: #ffd84d; font-weight: 800; }
+    .allocation-full { color: #38d9ff; font-weight: 800; }
+    .allocation-over { color: #ff6b88; font-weight: 800; }
+
+    .view-all-wrap {
+      border-top: 1px solid rgba(52, 223, 255, 0.22);
+      background: rgba(2, 12, 32, 0.72);
+      padding: 16px 10px 10px;
+      text-align: center;
+    }
+
+    .view-all-button {
+      display: inline-block;
+      border: none;
+      background: transparent;
+      color: #1ea7ff;
+      font-size: 18px;
+      font-weight: 900;
+      text-decoration: underline;
+      text-underline-offset: 5px;
+      cursor: pointer;
+      letter-spacing: 0.3px;
+      font-family: "Segoe UI", Arial, sans-serif;
+    }
+
+    .auto-update-note {
+      margin-top: 18px;
+      color: rgba(255,255,255,0.78);
+      font-size: 11px;
+      font-weight: 400;
+    }
+
+    .footer {
+      margin: 9px 8px 0;
+      display: flex;
+      justify-content: space-between;
+      gap: 12px;
+      color: var(--muted);
+      font-size: 11px;
+      font-style: italic;
+      font-weight: 400;
+    }
+
+    .loader {
+      min-height: 100vh;
+      display: grid;
+      place-items: center;
+      font-size: 18px;
+      font-weight: 800;
+      color: var(--cyan);
+      position: relative;
+      z-index: 2;
+      text-align: center;
+      padding: 20px;
+    }
+
+    .loader-card {
+      background: rgba(5, 22, 53, 0.72);
+      border: 1px solid rgba(52, 223, 255, 0.28);
+      border-radius: 18px;
+      padding: 24px 30px;
+      box-shadow: 0 14px 30px rgba(0,0,0,0.35);
+    }
+
+    .loader-small {
+      margin-top: 9px;
+      font-size: 12px;
+      color: var(--muted);
+      font-weight: 500;
+    }
+
+    @media (max-width: 1100px) {
+      .hero-inner,
+      .grid-main {
+        grid-template-columns: 1fr;
+      }
+
+      .hero-cards,
+      .filters,
+      .kpis {
+        grid-template-columns: repeat(2, 1fr);
+      }
+
+      .expense-filter-bar {
+        grid-template-columns: 1fr 1fr;
+      }
+
+      .expense-refresh-button {
+        grid-column: span 2;
+      }
+
+      .hero h1 {
+        white-space: normal;
+      }
+    }
+
+    @media (max-width: 700px) {
+      .page {
+        padding: 6px;
+      }
+
+      .brand {
+        align-items: flex-start;
+      }
+
+      .main-logo {
+        width: 68px;
+        height: 68px;
+      }
+
+      .hero-cards,
+      .filters,
+      .kpis,
+      .expense-filter-bar {
+        grid-template-columns: 1fr;
+      }
+
+      .expense-refresh-button {
+        grid-column: auto;
+      }
+
+      .hero h1 {
+        font-size: 26px;
+        white-space: normal;
+      }
+
+      .footer {
+        flex-direction: column;
+      }
+
+      table {
+        font-size: 10px;
+      }
+
+      th,
+      td {
+        padding: 7px 5px;
+      }
     }
   </style>
 </head>
 
 <body>
-  <main class="page">
-    <div class="decor-lines"></div>
-    <div class="dot-pattern"></div>
-
-    <div class="topbar">
-      <div>
-        <h1 class="main-title">
-          PROGRAMS AND<br>
-          DEVELOPMENT DIVISION<br>
-          <span class="title-gradient">PROJECTS</span>
-        </h1>
-        <div class="title-line"></div>
-      </div>
-
-      <div class="mode-pill">
-        <span class="mode-dot"></span>
-        <span>
-          <span id="modeText">Demo Data</span>
-          <span id="dateText" class="date-text">Ready</span>
-        </span>
-      </div>
+  <div id="loader" class="loader">
+    <div class="loader-card">
+      Loading OPSD Budget Summary Dashboard from Google Sheets.
+      <div class="loader-small">Please wait. Data will appear after the sheet is fully read.</div>
     </div>
+  </div>
 
-    <div id="message" class="message"></div>
+  <div id="dashboard" class="page" style="display:none;">
+    <section class="hero-wrap">
+      <div class="hero-glow-line"></div>
 
-    <section class="infographic-area">
-      <div class="wheel-box">
-        <svg viewBox="0 0 900 900" role="img" aria-label="Programs and Development Division Projects">
-          <defs id="gradientDefs"></defs>
+      <div class="hero">
+        <div class="hero-inner">
+          <div class="brand">
+            <div class="main-logo">
+              <img id="mainLogoImage" src="" alt="OPSD Logo" onerror="showLogoFallback()">
+              <div id="logoFallback" class="logo-fallback">OPSD<br>Logo</div>
+            </div>
 
-          <g id="segmentsGroup"></g>
-          <g id="highlightsGroup"></g>
-          <g id="labelsGroup"></g>
+            <div class="hero-title-block">
+              <h1>OPSD Budget Summary Dashboard</h1>
+              <div class="eyebrow">Quarterly Budget Monitoring System</div>
+            </div>
+          </div>
 
-          <g class="center-circle">
-            <circle cx="450" cy="455" r="176" fill="#ffffff"></circle>
-            <circle cx="450" cy="455" r="166" fill="url(#centerOuterGradient)"></circle>
-            <circle cx="450" cy="455" r="140" fill="#ffffff"></circle>
-            <circle cx="450" cy="455" r="128" fill="url(#centerInnerGradient)"></circle>
-          </g>
+          <div class="hero-cards">
+            <div class="hero-mini">
+              <div class="hero-card-icon">📅</div>
+              <div class="hero-card-text">
+                <span>Quarter</span>
+                <strong>
+                  <span class="line">2nd Quarter AY</span>
+                  <span class="line">2026-2027</span>
+                </strong>
+              </div>
+            </div>
 
-          <g class="center-logo-wrap">
-            <clipPath id="logoClip">
-              <circle cx="450" cy="455" r="118"></circle>
-            </clipPath>
+            <div class="hero-mini">
+              <div class="hero-card-icon">🏛️</div>
+              <div class="hero-card-text">
+                <span>Coverage</span>
+                <strong id="coverageText">OPSD HEDF/GAA</strong>
+              </div>
+            </div>
 
-            <image
-              id="centerLogo"
-              x="332"
-              y="337"
-              width="236"
-              height="236"
-              preserveAspectRatio="xMidYMid meet"
-              clip-path="url(#logoClip)">
-            </image>
+            <div class="hero-mini">
+              <div class="hero-card-icon">🕒</div>
+              <div class="hero-card-text">
+                <span>Updated</span>
+                <strong id="lastUpdated">Live from Google Sheets</strong>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
 
-            <circle cx="450" cy="455" r="119" fill="none" stroke="rgba(255,255,255,0.96)" stroke-width="8"></circle>
-            <circle cx="450" cy="455" r="130" fill="none" stroke="rgba(0,199,215,0.35)" stroke-width="3"></circle>
-          </g>
+      <section class="filters">
+        <div class="filter-field">
+          <label>Quarter</label>
+          <select class="filter-control">
+            <option>2nd Quarter AY 2026-2027</option>
+          </select>
+        </div>
 
-          <g id="hitGroup"></g>
-        </svg>
+        <div class="filter-field">
+          <label>Funding Source</label>
+          <select id="mainFundingSourceFilter" class="filter-control">
+            <option value="All">All</option>
+            <option value="HEDF">HEDF</option>
+            <option value="GAA">GAA</option>
+          </select>
+        </div>
+
+        <div class="filter-field">
+          <label>Date Range</label>
+          <select class="filter-control">
+            <option>Apr 1, 2026 - Jun 30, 2026</option>
+            <option>Live Data</option>
+          </select>
+        </div>
+
+        <button class="filter-button" type="button">▽ FILTER</button>
+      </section>
+    </section>
+
+    <section class="kpis">
+      <div class="kpi">
+        <div class="logo-badge">💳</div>
+        <div>
+          <div class="label">Approved Budget</div>
+          <div class="value" id="approvedBudget">₱0.00</div>
+          <div class="note"><b>2nd Quarter AY 2026-2027 allocation</b> based on linked sheet</div>
+        </div>
+      </div>
+
+      <div class="kpi green">
+        <div class="logo-badge">📄</div>
+        <div>
+          <div class="label">Total Actual Expenses</div>
+          <div class="value" id="totalExpenses">₱0.00</div>
+          <div class="note"><b id="utilizationText">0%</b> budget utilization</div>
+        </div>
+      </div>
+
+      <div class="kpi orange">
+        <div class="logo-badge">📅</div>
+        <div>
+          <div class="label">Daily Expenses</div>
+          <div class="value" id="dailyExpenses">₱0.00</div>
+          <div class="note"><b>Latest</b> daily expense per project</div>
+        </div>
+      </div>
+
+      <div class="kpi purple">
+        <div class="logo-badge">◔</div>
+        <div>
+          <div class="label">Remaining Budget</div>
+          <div class="value" id="remainingBalance">₱0.00</div>
+          <div class="note">Available balance from approved budget</div>
+        </div>
+      </div>
+
+      <div class="kpi red">
+        <div class="logo-badge">⚠</div>
+        <div>
+          <div class="label">For Attention</div>
+          <div class="value" id="attentionCount">0</div>
+          <div class="note">Above 80% utilization threshold</div>
+        </div>
       </div>
     </section>
 
-    <section class="details-panel">
-      <div id="detailIcon" class="detail-icon">◎</div>
+    <section class="panel table-panel">
+      <div class="panel-title">
+        <div class="logo-badge">▣</div>
+        <h2>Project Allocation per Quarter</h2>
+        <span class="tag">Budget status</span>
+      </div>
 
-      <div>
-        <h2 id="detailTitle" class="detail-title">Loading...</h2>
-        <p id="detailDesc" class="detail-desc">Please wait while data is loading.</p>
+      <table>
+        <thead>
+          <tr>
+            <th>Project / Program</th>
+            <th>Funding Source</th>
+            <th>Quarter</th>
+            <th>Allocation</th>
+            <th>Used Amount</th>
+            <th>Remaining Balance</th>
+            <th>Utilization %</th>
+            <th>Allocation Status</th>
+          </tr>
+        </thead>
+        <tbody id="allocationTable"></tbody>
+        <tfoot>
+          <tr>
+            <td>Total</td>
+            <td id="allocationTotalFunding">All</td>
+            <td>2nd Quarter</td>
+            <td id="allocationTotalBudget">₱0.00</td>
+            <td id="allocationTotalUsed">₱0.00</td>
+            <td id="allocationTotalRemaining">₱0.00</td>
+            <td id="allocationTotalUtilization">0%</td>
+            <td></td>
+          </tr>
+        </tfoot>
+      </table>
+    </section>
 
-        <div class="detail-grid">
-          <div class="detail-card"><div class="detail-label">Status</div><div id="detailStatus" class="detail-value">-</div></div>
-          <div class="detail-card"><div class="detail-label">Progress</div><div id="detailProgress" class="detail-value">-</div></div>
-          <div class="detail-card"><div class="detail-label">Timeline</div><div id="detailTimeline" class="detail-value">-</div></div>
-          <div class="detail-card"><div class="detail-label">Budget</div><div id="detailBudget" class="detail-value">-</div></div>
-          <div class="detail-card"><div class="detail-label">Utilization</div><div id="detailUtilization" class="detail-value">-</div></div>
+    <section class="grid-main">
+      <div class="panel">
+        <div class="panel-title">
+          <div class="logo-badge">📈</div>
+          <h2>Approved Budget per Project</h2>
+          <span class="tag">Alloted budget per quarter</span>
         </div>
-
-        <div class="wide-grid">
-          <div class="wide-card"><div class="detail-label">Accomplishment</div><div id="detailAccomplishment" class="detail-value">-</div></div>
-          <div class="wide-card"><div class="detail-label">Remarks</div><div id="detailRemarks" class="detail-value">-</div></div>
+        <div class="chart-box">
+          <canvas id="dailyExpenseChart"></canvas>
         </div>
+      </div>
 
-        <div class="hint">☝ Click any segment to view details</div>
+      <div class="panel">
+        <div class="panel-title">
+          <div class="logo-badge">🟢</div>
+          <h2>Remaining Budget per Project</h2>
+          <span class="tag">Available balance</span>
+        </div>
+        <div class="chart-box">
+          <canvas id="remainingBudgetChart"></canvas>
+        </div>
       </div>
     </section>
 
-    <div class="actions">
-      <button onclick="loadData()">Refresh Data</button>
-      <button class="ghost-btn" onclick="window.print()">Print / Save PDF</button>
+    <section class="panel table-panel">
+      <div class="panel-title">
+        <div class="logo-badge">▦</div>
+        <h2>Daily Monitoring Expenses per Project</h2>
+        <span class="tag">Reference details</span>
+      </div>
+
+      <div class="expense-filter-bar">
+        <input id="expenseSearch" class="expense-filter-input" type="text" placeholder="🔍 Search activity, project, date...">
+
+        <select id="expenseProjectFilter" class="expense-filter-select">
+          <option value="All">All Projects</option>
+        </select>
+
+        <select id="expenseFundingFilter" class="expense-filter-select">
+          <option value="All">All Funding</option>
+          <option value="HEDF">HEDF</option>
+          <option value="GAA">GAA</option>
+        </select>
+
+        <select id="expenseMonthFilter" class="expense-filter-select">
+          <option value="All">All Months</option>
+        </select>
+
+        <button id="checkNowButton" class="expense-refresh-button" type="button">↻ Check Now</button>
+      </div>
+
+      <table>
+        <thead>
+          <tr>
+            <th>Date</th>
+            <th>Project</th>
+            <th>Activity / Particulars</th>
+            <th>Funding Source</th>
+            <th>Total Alloted Budget</th>
+            <th>Total Approved RBA</th>
+            <th>Balance</th>
+          </tr>
+        </thead>
+        <tbody id="expenseRecordTable"></tbody>
+      </table>
+
+      <div class="view-all-wrap">
+        <button id="viewAllDataButton" class="view-all-button" type="button">
+          View All Data ›
+        </button>
+        <div class="auto-update-note">
+          Dashboard updates automatically without page refresh.
+        </div>
+      </div>
+    </section>
+
+    <div class="footer">
+      <div>Google Apps Script Web Dashboard • Data source: Linked Google Sheets OPSD HEDF/GAA 2nd Quarter AY 2026-2027</div>
+      <div>Designed for executive monitoring and decision-making</div>
     </div>
-  </main>
+  </div>
 
   <script>
-    /*
-      GITHUB PAGES SETUP:
-      Option 1: Demo mode - leave SHEET_CSV_URL blank.
-      Option 2: Connect Google Sheets:
-      File > Share > Publish to web > Projects sheet > Comma-separated values (.csv)
-      Paste the published CSV link below.
-    */
+    const GAS_WEB_APP_URL = 'https://script.google.com/macros/s/AKfycbx8jsMV6AmMM2S4LEYkmscV4FUE5h2Uhg_TXPyIhYUZlkr5Ko2nzBvyd-p6YuYvOKN-/exec';
 
-    const SHEET_CSV_URL = "";
+    const LOGO_FILE_ID = '12eGD35nc4o7Fpns98RN1bK6vbntkK2Kx';
+    const MIN_LOADING_TIME = 300;
+    const AUTO_REFRESH_INTERVAL_MS = 120000;
 
-    const LOGO_FILE_ID = "12eGD35nc4o7Fpns98RN1bK6vbntkK2Kx";
-    const LOGO_URL = "https://drive.google.com/thumbnail?id=" + LOGO_FILE_ID + "&sz=w1000";
+    let dailyExpenseChart;
+    let remainingBudgetChart;
 
-    const DEFAULT_DATA = [
-      { department: "Center of Excellence", title: "CENTER OF EXCELLENCE", icon: "trophy", color: "#00C7D7", color2: "#007C8E", description: "Promotes excellence through specialized programs and innovation.", project: "Centers of Excellence Evaluation and Monitoring", status: "Ongoing", progress: 82, timeline: "Q1 - Q4", budget: "N/A", utilization: "N/A", accomplishment: "Center initiatives and programs are actively implemented.", remarks: "Continue monitoring and strengthening programs." },
-      { department: "Equivalency", title: "EQUIVALENCY", icon: "certificate", color: "#B53DFF", color2: "#4B1C8C", description: "Ensures quality and recognition of prior learning.", project: "Certificate of Equivalency Evaluation", status: "Ongoing", progress: 76, timeline: "Year-round", budget: "N/A", utilization: "N/A", accomplishment: "Applications are evaluated based on documentary requirements.", remarks: "Continue processing and technical review." },
-      { department: "NAFES", title: "NAFES", icon: "people", color: "#FF2F92", color2: "#B5179E", description: "Strengthens flexible education and learning systems.", project: "National Academic Framework and Flexible Learning Systems", status: "Ongoing", progress: 70, timeline: "Q2 - Q4", budget: "N/A", utilization: "N/A", accomplishment: "Framework development and coordination activities are ongoing.", remarks: "For continued consultation and refinement." },
-      { department: "PQF", title: "PQF", icon: "badge", color: "#FF8A1F", color2: "#E05208", description: "Aligns qualifications with national and international standards.", project: "Philippine Qualifications Framework Alignment", status: "Ongoing", progress: 80, timeline: "Q1 - Q4", budget: "N/A", utilization: "N/A", accomplishment: "PQF-related activities and coordination are being implemented.", remarks: "Sustain alignment activities and monitoring." },
-      { department: "Seed Fund for Medicine", title: "SEED FUND FOR MEDICINE", icon: "seed", color: "#FFD21A", color2: "#FF9F00", description: "Supports medical research and development initiatives.", project: "Seed Fund for Medicine Program Support", status: "For Monitoring", progress: 68, timeline: "Q2 - Q4", budget: "For updating", utilization: "For updating", accomplishment: "Initial support mechanisms and monitoring items are being consolidated.", remarks: "Update funding and utilization data." },
-      { department: "Honoris Causa", title: "HONORIS CAUSA", icon: "cap", color: "#65E833", color2: "#168A20", description: "Recognizes outstanding individuals for significant contributions.", project: "Honorary Degree Policy and Review", status: "Ongoing", progress: 72, timeline: "As needed", budget: "N/A", utilization: "N/A", accomplishment: "Policy review and documentation activities are ongoing.", remarks: "Ensure consistency with applicable guidelines." },
-      { department: "PSG Development", title: "PSG DEVELOPMENT", icon: "chart", color: "#18A8FF", color2: "#005BBB", description: "Enhances institutional performance and sustainability.", project: "Policies, Standards and Guidelines Development", status: "Ongoing", progress: 85, timeline: "Year-round", budget: "N/A", utilization: "N/A", accomplishment: "PSG development and revision activities are being coordinated.", remarks: "Continue technical panel coordination and policy refinement." }
+    let masterDashboardData = null;
+    let allExpenseRows = [];
+    let allProjects = [];
+    let allMonths = [];
+
+    let loadingStartedAt = Date.now();
+    let isDashboardLoadedOnce = false;
+    let isDashboardLoading = false;
+    let isViewingAllData = false;
+
+    const chartColors = [
+      '#38d9ff',
+      '#00d66b',
+      '#ffb000',
+      '#9b5cff',
+      '#ff4d6d',
+      '#22c55e',
+      '#0ea5e9',
+      '#f97316',
+      '#60a5fa',
+      '#facc15'
     ];
 
-    const SVG_NS = "http://www.w3.org/2000/svg";
-    const XLINK_NS = "http://www.w3.org/1999/xlink";
-    let items = [];
+    loadLogo();
+    bindMainFilters();
+    loadDashboard(false);
 
-    const center = { x: 450, y: 455 };
-    const outerRadius = 374;
-    const innerRadius = 184;
+    setInterval(function() {
+      if (!isDashboardLoading) {
+        loadDashboard(false);
+      }
+    }, AUTO_REFRESH_INTERVAL_MS);
 
-    const segmentAngles = [
-      { start: 334, end: 386 }, { start: 386, end: 438 }, { start: 438, end: 490 },
-      { start: 490, end: 542 }, { start: 178, end: 230 }, { start: 230, end: 282 }, { start: 282, end: 334 }
-    ];
+    function requestDashboardData(forceRefresh) {
+      return new Promise(function(resolve, reject) {
+        if (!GAS_WEB_APP_URL || GAS_WEB_APP_URL.indexOf('PASTE_YOUR_DEPLOYED') >= 0) {
+          reject(new Error('Please replace GAS_WEB_APP_URL with your deployed Apps Script Web App URL.'));
+          return;
+        }
 
-    const labelPositions = [
-      { x: 450, y: 195, w: 205, h: 170 }, { x: 665, y: 305, w: 195, h: 165 },
-      { x: 704, y: 535, w: 195, h: 160 }, { x: 565, y: 708, w: 205, h: 155 },
-      { x: 335, y: 708, w: 210, h: 155 }, { x: 196, y: 535, w: 205, h: 160 },
-      { x: 235, y: 305, w: 205, h: 165 }
-    ];
+        const callbackName = 'dashboardCallback_' + Date.now() + '_' + Math.floor(Math.random() * 100000);
+        const script = document.createElement('script');
 
-    const icons = { trophy: "🏆", certificate: "▤", people: "☷", badge: "✓", seed: "♧", cap: "◇", chart: "↗" };
+        const params = new URLSearchParams({
+          action: 'getDashboardData',
+          forceRefresh: forceRefresh === true ? 'true' : 'false',
+          fundingSource: 'All',
+          callback: callbackName
+        });
 
-    document.addEventListener("DOMContentLoaded", loadData);
+        const separator = GAS_WEB_APP_URL.indexOf('?') >= 0 ? '&' : '?';
+        const timeout = setTimeout(function() {
+          cleanup();
+          reject(new Error('Dashboard data request timed out. Please check the Apps Script Web App URL and deployment access.'));
+        }, 60000);
 
-    async function loadData() {
-      setMessage("");
-      setCenterLogo();
+        function cleanup() {
+          clearTimeout(timeout);
+          if (script.parentNode) {
+            script.parentNode.removeChild(script);
+          }
+          try {
+            delete window[callbackName];
+          } catch (err) {
+            window[callbackName] = undefined;
+          }
+        }
 
-      if (!SHEET_CSV_URL) {
-        items = DEFAULT_DATA;
-        setMode("Demo Data", "Ready");
-        renderInfographic();
-        selectSegment(0);
+        window[callbackName] = function(data) {
+          cleanup();
+
+          if (data && data.error) {
+            reject(new Error(data.message || data.error));
+            return;
+          }
+
+          resolve(data);
+        };
+
+        script.onerror = function() {
+          cleanup();
+          reject(new Error('Unable to load dashboard data from Apps Script Web App.'));
+        };
+
+        script.src = GAS_WEB_APP_URL + separator + params.toString();
+        document.body.appendChild(script);
+      });
+    }
+
+    function loadDashboard(forceRefresh) {
+      if (isDashboardLoading) return;
+
+      isDashboardLoading = true;
+      loadingStartedAt = Date.now();
+
+      const loader = document.getElementById('loader');
+      const dashboard = document.getElementById('dashboard');
+
+      if (!isDashboardLoadedOnce) {
+        loader.style.display = 'grid';
+        dashboard.style.display = 'none';
+      } else {
+        loader.style.display = 'none';
+        dashboard.style.display = 'block';
+        setDashboardRefreshState(true);
+      }
+
+      requestDashboardData(forceRefresh === true)
+        .then(function(data) {
+          const elapsed = Date.now() - loadingStartedAt;
+          const waitTime = isDashboardLoadedOnce ? 0 : Math.max(0, MIN_LOADING_TIME - elapsed);
+
+          setTimeout(function() {
+            isDashboardLoading = false;
+            isDashboardLoadedOnce = true;
+            setDashboardRefreshState(false);
+
+            masterDashboardData = data;
+            renderDashboardByFundingSource(getMainFundingSourceFilterValue());
+          }, waitTime);
+        })
+        .catch(function(error) {
+          isDashboardLoading = false;
+          setDashboardRefreshState(false);
+          showError(error);
+        });
+    }
+
+    function buildFilteredDashboardData(sourceValue) {
+      if (!masterDashboardData) return null;
+
+      sourceValue = sourceValue || 'All';
+
+      const sourceLabel = sourceValue === 'HEDF' || sourceValue === 'GAA' ? sourceValue : 'All';
+
+      const originalProjectSummary = masterDashboardData.projectSummary || [];
+      const originalExpenseRows = masterDashboardData.expenseRows || [];
+
+      const projectSummary = sourceLabel === 'All'
+        ? originalProjectSummary.slice()
+        : originalProjectSummary.filter(row => row.fundingSource === sourceLabel);
+
+      const expenseRows = sourceLabel === 'All'
+        ? originalExpenseRows.slice()
+        : originalExpenseRows.filter(row => row.fundingSource === sourceLabel);
+
+      const approvedBudget = projectSummary.reduce((sum, item) => {
+        return sum + Number(item.approvedBudget || 0);
+      }, 0);
+
+      const totalExpenses = projectSummary.reduce((sum, item) => {
+        return sum + Number(item.totalExpenses || 0);
+      }, 0);
+
+      const dailyExpenses = projectSummary.reduce((sum, item) => {
+        return sum + Number(item.dailyExpense || 0);
+      }, 0);
+
+      const remainingBalance = projectSummary.reduce((sum, item) => {
+        return sum + Number(item.remainingBudget || 0);
+      }, 0);
+
+      const utilizationRate = approvedBudget > 0 ? totalExpenses / approvedBudget : 0;
+
+      const attentionCount = projectSummary.filter(item => {
+        return Number(item.utilization || 0) >= 0.8;
+      }).length;
+
+      const allocationRows = projectSummary.map(item => {
+        const utilization = Number(item.utilization || 0);
+        const allocation = Number(item.approvedBudget || 0);
+        const usedAmount = Number(item.totalExpenses || 0);
+        const remainingAmount = Number(item.remainingBudget || 0);
+
+        let allocationStatus = 'Within Allocation';
+
+        if (usedAmount > allocation) {
+          allocationStatus = 'Over Allocation';
+        } else if (allocation > 0 && Math.abs(usedAmount - allocation) < 0.01) {
+          allocationStatus = 'Fully Utilized';
+        } else if (utilization >= 0.8) {
+          allocationStatus = 'Near Limit';
+        }
+
+        return {
+          project: item.project,
+          fundingSource: item.fundingSource || sourceLabel,
+          quarter: item.quarter || '2nd Quarter',
+          allocation: allocation,
+          usedAmount: usedAmount,
+          remainingBalance: remainingAmount,
+          utilization: utilization,
+          allocationStatus: allocationStatus
+        };
+      });
+
+      const projectFilterSet = {};
+      const monthFilterMap = {};
+
+      expenseRows.forEach(row => {
+        if (row.project) {
+          projectFilterSet[row.project] = true;
+        }
+
+        if (row.monthKey && row.monthLabel) {
+          monthFilterMap[row.monthKey] = row.monthLabel;
+        }
+      });
+
+      const filterProjects = Object.keys(projectFilterSet).sort();
+
+      const filterMonths = Object.keys(monthFilterMap)
+        .sort()
+        .map(key => {
+          return {
+            value: key,
+            label: monthFilterMap[key]
+          };
+        });
+
+      return {
+        selectedFundingSource: sourceLabel,
+        approvedBudget: approvedBudget,
+        totalExpenses: totalExpenses,
+        totalObligated: totalExpenses,
+        dailyExpenses: dailyExpenses,
+        remainingBalance: remainingBalance,
+        utilizationRate: utilizationRate,
+        attentionCount: attentionCount,
+        projectSummary: projectSummary,
+        allocationRows: allocationRows,
+        fundingSummary: masterDashboardData.fundingSummary || [],
+        expenseRows: expenseRows,
+        filterProjects: filterProjects,
+        filterMonths: filterMonths,
+        lastUpdated: masterDashboardData.lastUpdated
+      };
+    }
+
+    function renderDashboardByFundingSource(sourceValue) {
+      const filteredData = buildFilteredDashboardData(sourceValue);
+
+      if (!filteredData) return;
+
+      renderDashboard(filteredData);
+    }
+
+    function setDashboardRefreshState(isRefreshing) {
+      const button = document.getElementById('checkNowButton');
+      const mainButton = document.querySelector('.filter-button');
+
+      if (button) {
+        button.disabled = isRefreshing;
+        button.textContent = isRefreshing ? '↻ Checking...' : '↻ Check Now';
+      }
+
+      if (mainButton) {
+        mainButton.disabled = isRefreshing;
+        mainButton.textContent = isRefreshing ? 'LOADING...' : '▽ FILTER';
+      }
+    }
+
+    function getMainFundingSourceFilterValue() {
+      const select = document.getElementById('mainFundingSourceFilter');
+      return select ? select.value : 'All';
+    }
+
+    function updateCoverageText(selectedFundingSource) {
+      const coverageText = document.getElementById('coverageText');
+
+      if (!coverageText) return;
+
+      if (selectedFundingSource === 'HEDF') {
+        coverageText.textContent = 'OPSD HEDF';
+      } else if (selectedFundingSource === 'GAA') {
+        coverageText.textContent = 'OPSD GAA';
+      } else {
+        coverageText.textContent = 'OPSD HEDF/GAA';
+      }
+    }
+
+    function bindMainFilters() {
+      const mainFundingSourceFilter = document.getElementById('mainFundingSourceFilter');
+      const mainFilterButton = document.querySelector('.filter-button');
+
+      if (mainFundingSourceFilter) {
+        mainFundingSourceFilter.onchange = function() {
+          isViewingAllData = false;
+          renderDashboardByFundingSource(getMainFundingSourceFilterValue());
+        };
+      }
+
+      if (mainFilterButton) {
+        mainFilterButton.onclick = function() {
+          isViewingAllData = false;
+          renderDashboardByFundingSource(getMainFundingSourceFilterValue());
+        };
+      }
+    }
+
+    function loadLogo() {
+      const img = document.getElementById('mainLogoImage');
+      const fallback = document.getElementById('logoFallback');
+
+      if (!LOGO_FILE_ID) {
+        img.style.display = 'none';
+        fallback.style.display = 'block';
         return;
       }
 
-      try {
-        setMode("Loading", "Please wait");
-        const response = await fetch(SHEET_CSV_URL + cacheBuster(), { method: "GET", cache: "no-store" });
-        if (!response.ok) throw new Error("Unable to load Google Sheet CSV.");
-
-        const rows = parseCSV(await response.text());
-        if (!rows || rows.length < 2) throw new Error("CSV has no data rows.");
-
-        const liveItems = mapRowsToProjects(rows);
-        items = liveItems.length ? liveItems : DEFAULT_DATA;
-        setMode("Live Data", new Date().toLocaleString());
-        renderInfographic();
-        selectSegment(0);
-      } catch (error) {
-        items = DEFAULT_DATA;
-        setMode("Demo Data", "CSV not loaded");
-        setMessage("Unable to load Google Sheet data. Showing demo data. " + error.message);
-        renderInfographic();
-        selectSegment(0);
-      }
+      img.src = 'https://drive.google.com/thumbnail?id=' + LOGO_FILE_ID + '&sz=w1000';
+      img.style.display = 'block';
+      fallback.style.display = 'none';
     }
 
-    function setMode(mode, dateText) {
-      document.getElementById("modeText").textContent = mode;
-      document.getElementById("dateText").textContent = dateText || "";
+    function showLogoFallback() {
+      const img = document.getElementById('mainLogoImage');
+      const fallback = document.getElementById('logoFallback');
+
+      img.style.display = 'none';
+      fallback.style.display = 'block';
     }
 
-    function setCenterLogo() {
-      const logo = document.getElementById("centerLogo");
-      if (!logo) return;
-      logo.setAttribute("href", LOGO_URL);
-      logo.setAttributeNS(XLINK_NS, "href", LOGO_URL);
+    function renderDashboard(data) {
+      document.getElementById('loader').style.display = 'none';
+      document.getElementById('dashboard').style.display = 'block';
+
+      document.getElementById('approvedBudget').textContent = formatPesoShort(data.approvedBudget);
+      document.getElementById('totalExpenses').textContent = formatPesoShort(data.totalExpenses);
+      document.getElementById('dailyExpenses').textContent = formatPesoShort(data.dailyExpenses);
+      document.getElementById('remainingBalance').textContent = formatPesoShort(data.remainingBalance);
+      document.getElementById('attentionCount').textContent = data.attentionCount + ' Projects';
+      document.getElementById('utilizationText').textContent = formatPercent(data.utilizationRate);
+      document.getElementById('lastUpdated').innerHTML = formatUpdatedDateTime(data.lastUpdated);
+
+      updateCoverageText(data.selectedFundingSource || getMainFundingSourceFilterValue());
+
+      document.getElementById('allocationTotalFunding').textContent = data.selectedFundingSource || 'All';
+      document.getElementById('allocationTotalBudget').textContent = formatPesoShort(data.approvedBudget);
+      document.getElementById('allocationTotalUsed').textContent = formatPesoShort(data.totalExpenses);
+      document.getElementById('allocationTotalRemaining').textContent = formatPesoShort(data.remainingBalance);
+      document.getElementById('allocationTotalUtilization').textContent = formatPercent(data.utilizationRate);
+
+      allExpenseRows = data.expenseRows || [];
+      allProjects = data.filterProjects || [];
+      allMonths = data.filterMonths || [];
+
+      resetExpenseFundingFilterForMainSource(data.selectedFundingSource || 'All');
+      populateExpenseFilters();
+      bindExpenseFilters();
+
+      renderAllocationTable(data.allocationRows || []);
+      renderApprovedBudgetChart(data.projectSummary || []);
+      renderRemainingBudgetChart(data.projectSummary || []);
+      renderExpenseRecordTable(allExpenseRows);
     }
 
-    function mapRowsToProjects(rows) {
-      const headers = rows[0].map(normalizeHeader);
-      const dataRows = rows.slice(1).filter(row => row.some(cell => String(cell || "").trim() !== ""));
+    function resetExpenseFundingFilterForMainSource(sourceValue) {
+      const funding = document.getElementById('expenseFundingFilter');
 
-      const records = dataRows.map(row => ({
-        department: getCell(row, headers, ["department", "project area", "program", "category"]),
-        project: getCell(row, headers, ["project", "project title", "activity", "program title"]),
-        status: getCell(row, headers, ["status", "project status"]),
-        progress: parseProgress(getCell(row, headers, ["progress", "percentage", "completion", "accomplishment rate"])),
-        timeline: getCell(row, headers, ["timeline", "target date", "period", "schedule"]),
-        budget: getCell(row, headers, ["budget", "allocated budget", "amount"]),
-        utilization: getCell(row, headers, ["utilization", "budget utilization", "utilized", "disbursement"]),
-        accomplishment: getCell(row, headers, ["accomplishment", "output", "deliverable", "result"]),
-        remarks: getCell(row, headers, ["remarks", "notes", "comments"])
-      }));
+      if (!funding) return;
 
-      return DEFAULT_DATA.map(defaultItem => {
-        const matching = records.filter(record => {
-          const dept = String(record.department || "").toLowerCase().trim();
-          const title = String(defaultItem.department || "").toLowerCase().trim();
-          return dept === title || dept.includes(title) || title.includes(dept);
+      funding.value = 'All';
+
+      Array.from(funding.options).forEach(option => {
+        option.disabled = false;
+      });
+
+      if (sourceValue === 'HEDF' || sourceValue === 'GAA') {
+        Array.from(funding.options).forEach(option => {
+          if (option.value !== 'All' && option.value !== sourceValue) {
+            option.disabled = true;
+          }
         });
+      }
+    }
 
-        if (!matching.length) return defaultItem;
+    function populateExpenseFilters() {
+      const projectSelect = document.getElementById('expenseProjectFilter');
+      const monthSelect = document.getElementById('expenseMonthFilter');
 
-        const progressTotal = matching.reduce((sum, item) => sum + Number(item.progress || 0), 0);
-        const averageProgress = matching.length ? Math.round(progressTotal / matching.length) : defaultItem.progress;
+      const currentProject = projectSelect.value || 'All';
+      const currentMonth = monthSelect.value || 'All';
 
-        return {
-          ...defaultItem,
-          project: matching.length === 1 ? matching[0].project || defaultItem.project : matching.length + " Projects",
-          status: summarizeStatus(matching),
-          progress: averageProgress,
-          timeline: uniqueJoin(matching.map(item => item.timeline)) || defaultItem.timeline,
-          budget: uniqueJoin(matching.map(item => item.budget)) || defaultItem.budget,
-          utilization: uniqueJoin(matching.map(item => item.utilization)) || defaultItem.utilization,
-          accomplishment: matching[0].accomplishment || defaultItem.accomplishment,
-          remarks: matching[0].remarks || defaultItem.remarks
+      projectSelect.innerHTML = '<option value="All">All Projects</option>';
+      allProjects.forEach(project => {
+        const option = document.createElement('option');
+        option.value = project;
+        option.textContent = project;
+        projectSelect.appendChild(option);
+      });
+
+      monthSelect.innerHTML = '<option value="All">All Months</option>';
+      allMonths.forEach(month => {
+        const option = document.createElement('option');
+        option.value = month.value;
+        option.textContent = month.label;
+        monthSelect.appendChild(option);
+      });
+
+      projectSelect.value = optionExists(projectSelect, currentProject) ? currentProject : 'All';
+      monthSelect.value = optionExists(monthSelect, currentMonth) ? currentMonth : 'All';
+    }
+
+    function optionExists(select, value) {
+      return Array.from(select.options).some(option => option.value === value);
+    }
+
+    function bindExpenseFilters() {
+      const search = document.getElementById('expenseSearch');
+      const project = document.getElementById('expenseProjectFilter');
+      const funding = document.getElementById('expenseFundingFilter');
+      const month = document.getElementById('expenseMonthFilter');
+      const refresh = document.getElementById('checkNowButton');
+      const viewAllButton = document.getElementById('viewAllDataButton');
+
+      search.oninput = applyExpenseFilters;
+
+      project.onchange = function() {
+        isViewingAllData = false;
+        applyExpenseFilters();
+      };
+
+      funding.onchange = function() {
+        isViewingAllData = false;
+        applyExpenseFilters();
+      };
+
+      month.onchange = function() {
+        isViewingAllData = false;
+        applyExpenseFilters();
+      };
+
+      refresh.onclick = function() {
+        loadDashboard(true);
+      };
+
+      if (viewAllButton) {
+        viewAllButton.onclick = function() {
+          isViewingAllData = !isViewingAllData;
+          applyExpenseFilters();
         };
-      });
-    }
-
-    function renderInfographic() {
-      const defs = document.getElementById("gradientDefs");
-      const segmentsGroup = document.getElementById("segmentsGroup");
-      const highlightsGroup = document.getElementById("highlightsGroup");
-      const labelsGroup = document.getElementById("labelsGroup");
-      const hitGroup = document.getElementById("hitGroup");
-
-      defs.innerHTML = `
-        <radialGradient id="centerOuterGradient" cx="50%" cy="35%" r="70%">
-          <stop offset="0%" stop-color="#F8FFFF"></stop>
-          <stop offset="40%" stop-color="#FFFFFF"></stop>
-          <stop offset="100%" stop-color="#B5F3FA"></stop>
-        </radialGradient>
-        <radialGradient id="centerInnerGradient" cx="50%" cy="35%" r="70%">
-          <stop offset="0%" stop-color="#FFFFFF"></stop>
-          <stop offset="100%" stop-color="#F5FBFF"></stop>
-        </radialGradient>
-      `;
-
-      segmentsGroup.innerHTML = "";
-      highlightsGroup.innerHTML = "";
-      labelsGroup.innerHTML = "";
-      hitGroup.innerHTML = "";
-
-      items.slice(0, 7).forEach((item, index) => {
-        const gradientId = "segGradient" + index;
-        const shineId = "shineGradient" + index;
-        const edgeId = "edgeGradient" + index;
-
-        const gradient = createSvgElement("linearGradient", { id: gradientId, x1: "0%", y1: "0%", x2: "100%", y2: "100%" });
-        gradient.appendChild(createSvgElement("stop", { offset: "0%", "stop-color": lightenColor(item.color || "#00B7C6", 24) }));
-        gradient.appendChild(createSvgElement("stop", { offset: "48%", "stop-color": item.color || "#00B7C6" }));
-        gradient.appendChild(createSvgElement("stop", { offset: "100%", "stop-color": item.color2 || item.color || "#007C8E" }));
-        defs.appendChild(gradient);
-
-        const shine = createSvgElement("linearGradient", { id: shineId, x1: "0%", y1: "0%", x2: "0%", y2: "100%" });
-        shine.appendChild(createSvgElement("stop", { offset: "0%", "stop-color": "#FFFFFF", "stop-opacity": "0.68" }));
-        shine.appendChild(createSvgElement("stop", { offset: "46%", "stop-color": "#FFFFFF", "stop-opacity": "0.10" }));
-        shine.appendChild(createSvgElement("stop", { offset: "100%", "stop-color": "#FFFFFF", "stop-opacity": "0" }));
-        defs.appendChild(shine);
-
-        const edge = createSvgElement("linearGradient", { id: edgeId, x1: "0%", y1: "0%", x2: "100%", y2: "0%" });
-        edge.appendChild(createSvgElement("stop", { offset: "0%", "stop-color": "#FFFFFF", "stop-opacity": "0.95" }));
-        edge.appendChild(createSvgElement("stop", { offset: "100%", "stop-color": item.color || "#00B7C6", "stop-opacity": "0.95" }));
-        defs.appendChild(edge);
-
-        const angle = segmentAngles[index];
-        const segmentD = describeDonutSegment(center.x, center.y, innerRadius, outerRadius, angle.start, angle.end);
-
-        const path = createSvgElement("path", { d: segmentD, fill: "url(#" + gradientId + ")", class: "segment-path", "data-index": index });
-        path.addEventListener("click", () => selectSegment(index));
-        segmentsGroup.appendChild(path);
-
-        highlightsGroup.appendChild(createSvgElement("path", {
-          d: describeDonutSegment(center.x, center.y, innerRadius + 16, outerRadius - 15, angle.start + 2, angle.end - 2),
-          fill: "url(#" + shineId + ")", class: "segment-highlight"
-        }));
-
-        highlightsGroup.appendChild(createSvgElement("path", {
-          d: describeDonutSegment(center.x, center.y, outerRadius - 16, outerRadius - 6, angle.start + 3, angle.end - 3),
-          fill: "url(#" + edgeId + ")", class: "segment-highlight"
-        }));
-
-        createSegmentLabel(labelsGroup, item, index);
-
-        const hitPath = createSvgElement("path", { d: segmentD, class: "segment-hit", "data-index": index });
-        hitPath.addEventListener("click", () => selectSegment(index));
-        hitPath.addEventListener("mouseenter", () => setHoverState(index, true));
-        hitPath.addEventListener("mouseleave", () => setHoverState(index, false));
-        hitGroup.appendChild(hitPath);
-      });
-    }
-
-    function createSegmentLabel(parent, item, index) {
-      const pos = labelPositions[index];
-      const foreignObject = createSvgElement("foreignObject", {
-        x: pos.x - pos.w / 2,
-        y: pos.y - pos.h / 2,
-        width: pos.w,
-        height: pos.h,
-        class: "label-object"
-      });
-
-      const div = document.createElement("div");
-      div.setAttribute("xmlns", "http://www.w3.org/1999/xhtml");
-      div.className = "segment-label";
-      div.innerHTML = `
-        <div class="icon">${icons[item.icon] || "◎"}</div>
-        <div class="title">${escapeHtml(item.title || item.department || "")}</div>
-        <div class="rule"></div>
-        <div class="desc">${escapeHtml(item.description || "")}</div>
-      `;
-      foreignObject.appendChild(div);
-      parent.appendChild(foreignObject);
-    }
-
-    function selectSegment(index) {
-      document.querySelectorAll(".segment-path").forEach(path => {
-        const isSelected = Number(path.getAttribute("data-index")) === index;
-        path.classList.toggle("active", isSelected);
-        path.classList.toggle("selected", isSelected);
-      });
-
-      const item = items[index];
-      if (!item) return;
-
-      document.getElementById("detailIcon").textContent = icons[item.icon] || "◎";
-      document.getElementById("detailIcon").style.background =
-        "linear-gradient(135deg, " + (item.color || "#00B7C6") + ", " + (item.color2 || item.color || "#007C8E") + ")";
-
-      document.getElementById("detailTitle").textContent = item.title || item.department || "";
-      document.getElementById("detailTitle").style.color = item.color || "#00B7C6";
-      document.getElementById("detailDesc").textContent = item.description || "";
-      document.getElementById("detailStatus").textContent = item.status || "-";
-      document.getElementById("detailProgress").textContent = (item.progress || 0) + "%";
-      document.getElementById("detailTimeline").textContent = item.timeline || "-";
-      document.getElementById("detailBudget").textContent = item.budget || "N/A";
-      document.getElementById("detailUtilization").textContent = item.utilization || "N/A";
-      document.getElementById("detailAccomplishment").textContent = item.accomplishment || "-";
-      document.getElementById("detailRemarks").textContent = item.remarks || "-";
-    }
-
-    function setHoverState(index, isHovering) {
-      const target = document.querySelector('.segment-path[data-index="' + index + '"]');
-      if (!target) return;
-      if (isHovering) target.classList.add("active");
-      else if (!target.classList.contains("selected")) target.classList.remove("active");
-    }
-
-    function describeDonutSegment(cx, cy, rInner, rOuter, startAngle, endAngle) {
-      const gap = 3.4;
-      const adjustedStart = startAngle + gap;
-      const adjustedEnd = endAngle - gap;
-      const startOuter = polarToCartesian(cx, cy, rOuter, adjustedEnd);
-      const endOuter = polarToCartesian(cx, cy, rOuter, adjustedStart);
-      const startInner = polarToCartesian(cx, cy, rInner, adjustedStart);
-      const endInner = polarToCartesian(cx, cy, rInner, adjustedEnd);
-      const largeArcFlag = adjustedEnd - adjustedStart <= 180 ? "0" : "1";
-      return ["M", startOuter.x, startOuter.y, "A", rOuter, rOuter, 0, largeArcFlag, 0, endOuter.x, endOuter.y, "L", startInner.x, startInner.y, "A", rInner, rInner, 0, largeArcFlag, 1, endInner.x, endInner.y, "Z"].join(" ");
-    }
-
-    function polarToCartesian(cx, cy, radius, angleInDegrees) {
-      const angleInRadians = (angleInDegrees - 90) * Math.PI / 180.0;
-      return { x: cx + radius * Math.cos(angleInRadians), y: cy + radius * Math.sin(angleInRadians) };
-    }
-
-    function createSvgElement(tag, attrs) {
-      const element = document.createElementNS(SVG_NS, tag);
-      Object.keys(attrs).forEach(key => element.setAttribute(key, attrs[key]));
-      return element;
-    }
-
-    function parseCSV(text) {
-      const rows = [];
-      let row = [];
-      let cell = "";
-      let insideQuotes = false;
-      for (let i = 0; i < text.length; i++) {
-        const char = text[i];
-        const nextChar = text[i + 1];
-        if (char === '"' && insideQuotes && nextChar === '"') { cell += '"'; i++; }
-        else if (char === '"') insideQuotes = !insideQuotes;
-        else if (char === "," && !insideQuotes) { row.push(cell); cell = ""; }
-        else if ((char === "\n" || char === "\r") && !insideQuotes) {
-          if (char === "\r" && nextChar === "\n") i++;
-          row.push(cell); rows.push(row); row = []; cell = "";
-        } else cell += char;
       }
-      if (cell || row.length) { row.push(cell); rows.push(row); }
-      return rows;
     }
 
-    function summarizeStatus(items) {
-      const statuses = items.map(item => String(item.status || "").toLowerCase());
-      if (statuses.some(s => s.includes("ongoing") || s.includes("in progress"))) return "Ongoing";
-      if (statuses.some(s => s.includes("completed") || s.includes("done"))) return "Completed";
-      if (statuses.some(s => s.includes("delayed"))) return "Delayed";
-      if (statuses.some(s => s.includes("pending"))) return "Pending";
-      if (statuses.some(s => s.includes("monitor"))) return "For Monitoring";
-      if (statuses.some(s => s.includes("updating"))) return "For Updating";
-      return items[0]?.status || "For Updating";
+    function applyExpenseFilters() {
+      const searchValue = document.getElementById('expenseSearch').value.toLowerCase().trim();
+      const projectValue = document.getElementById('expenseProjectFilter').value;
+      const fundingValue = document.getElementById('expenseFundingFilter').value;
+      const monthValue = document.getElementById('expenseMonthFilter').value;
+
+      const filtered = allExpenseRows.filter(row => {
+        const combinedText = [
+          row.date,
+          row.project,
+          row.activity,
+          row.fundingSource
+        ].join(' ').toLowerCase();
+
+        const monthKey = row.monthKey || '';
+
+        const matchSearch = !searchValue || combinedText.includes(searchValue);
+        const matchProject = projectValue === 'All' || row.project === projectValue;
+        const matchFunding = fundingValue === 'All' || row.fundingSource === fundingValue;
+        const matchMonth = monthValue === 'All' || monthKey === monthValue;
+
+        return matchSearch && matchProject && matchFunding && matchMonth;
+      });
+
+      renderExpenseRecordTable(filtered);
     }
 
-    function uniqueJoin(items) {
-      const clean = items.map(v => String(v || "").trim()).filter(v => v && v.toLowerCase() !== "n/a");
-      return [...new Set(clean)].slice(0, 3).join(", ");
-    }
+    function renderAllocationTable(rows) {
+      const tbody = document.getElementById('allocationTable');
+      tbody.innerHTML = '';
 
-    function normalizeHeader(value) {
-      return String(value || "").trim().toLowerCase().replace(/\s+/g, " ");
-    }
-
-    function getCell(row, headers, possibleHeaders) {
-      for (let i = 0; i < possibleHeaders.length; i++) {
-        const index = headers.indexOf(normalizeHeader(possibleHeaders[i]));
-        if (index !== -1) return row[index] || "";
+      if (!rows.length) {
+        tbody.innerHTML = '<tr><td colspan="8">No allocation data found.</td></tr>';
+        return;
       }
-      return "";
+
+      rows.forEach(row => {
+        const statusClass = getAllocationStatusClass(row.allocationStatus);
+
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+          <td>${escapeHtml(row.project)}</td>
+          <td>${escapeHtml(row.fundingSource || 'All')}</td>
+          <td>${escapeHtml(row.quarter)}</td>
+          <td>${formatPesoShort(row.allocation)}</td>
+          <td>${formatPesoShort(row.usedAmount)}</td>
+          <td>${formatPesoShort(row.remainingBalance)}</td>
+          <td>${formatPercent(row.utilization)}</td>
+          <td><span class="${statusClass}">${escapeHtml(row.allocationStatus)}</span></td>
+        `;
+        tbody.appendChild(tr);
+      });
     }
 
-    function parseProgress(value) {
-      if (value === "" || value === null || value === undefined) return 0;
-      const number = parseFloat(String(value).replace("%", "").trim());
-      if (isNaN(number)) return 0;
-      if (number <= 1) return Math.round(number * 100);
-      return Math.max(0, Math.min(100, Math.round(number)));
+    function getApprovedBudgetChartRows(rows) {
+      const mergedMap = {};
+      const order = [];
+
+      rows.forEach(row => {
+        const originalProject = String(row.project || '').trim();
+        const projectKey = originalProject.toUpperCase().includes('PSG') ? 'PSG' : originalProject;
+
+        if (!mergedMap[projectKey]) {
+          mergedMap[projectKey] = {
+            project: projectKey,
+            approvedBudget: 0
+          };
+          order.push(projectKey);
+        }
+
+        mergedMap[projectKey].approvedBudget += Number(row.approvedBudget || 0);
+      });
+
+      return order.map(key => mergedMap[key]);
     }
 
-    function lightenColor(hex, percent) {
-      hex = String(hex || "#00B7C6").replace("#", "");
-      if (hex.length === 3) hex = hex.split("").map(char => char + char).join("");
-      const number = parseInt(hex, 16);
-      let r = (number >> 16) + percent;
-      let g = ((number >> 8) & 0x00ff) + percent;
-      let b = (number & 0x0000ff) + percent;
-      r = Math.max(0, Math.min(255, r));
-      g = Math.max(0, Math.min(255, g));
-      b = Math.max(0, Math.min(255, b));
-      return "#" + (b | (g << 8) | (r << 16)).toString(16).padStart(6, "0");
+    function renderApprovedBudgetChart(rows) {
+      const chartRows = getApprovedBudgetChartRows(rows);
+
+      const labels = chartRows.map(r => r.project);
+      const values = chartRows.map(r => Number(r.approvedBudget || 0));
+
+      const ctx = document.getElementById('dailyExpenseChart').getContext('2d');
+
+      if (dailyExpenseChart) dailyExpenseChart.destroy();
+
+      dailyExpenseChart = new Chart(ctx, {
+        type: 'bar',
+        data: {
+          labels: labels,
+          datasets: [{
+            label: 'Approved Budget per Project',
+            data: values,
+            backgroundColor: labels.map((_, i) => chartColors[i % chartColors.length]),
+            borderColor: labels.map((_, i) => chartColors[i % chartColors.length]),
+            borderWidth: 1,
+            borderRadius: 8,
+            barThickness: 26
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: {
+            legend: { display: false },
+            tooltip: {
+              backgroundColor: '#03102a',
+              titleColor: '#ffffff',
+              bodyColor: '#ffffff',
+              borderColor: '#38d9ff',
+              borderWidth: 1,
+              callbacks: {
+                label: context => formatPeso(context.raw)
+              }
+            }
+          },
+          scales: {
+            y: {
+              beginAtZero: true,
+              grid: { color: 'rgba(52, 223, 255, 0.12)' },
+              ticks: {
+                color: '#b9d7ff',
+                callback: value => formatPesoShort(value)
+              }
+            },
+            x: {
+              grid: { display: false },
+              ticks: {
+                color: '#b9d7ff',
+                maxRotation: 35,
+                minRotation: 25
+              }
+            }
+          }
+        }
+      });
     }
 
-    function cacheBuster() {
-      return SHEET_CSV_URL.includes("?") ? "&v=" + Date.now() : "?v=" + Date.now();
+    function getRemainingBudgetChartRows(rows) {
+      const mergedMap = {};
+      const order = [];
+
+      rows.forEach(row => {
+        const originalProject = String(row.project || '').trim();
+        const projectKey = originalProject.toUpperCase().includes('PSG') ? 'PSG' : originalProject;
+
+        if (!mergedMap[projectKey]) {
+          mergedMap[projectKey] = {
+            project: projectKey,
+            remainingBudget: 0
+          };
+          order.push(projectKey);
+        }
+
+        mergedMap[projectKey].remainingBudget += Number(row.remainingBudget || 0);
+      });
+
+      return order.map(key => mergedMap[key]);
     }
 
-    function setMessage(text) {
-      const box = document.getElementById("message");
-      if (!text) { box.style.display = "none"; box.textContent = ""; return; }
-      box.style.display = "block";
-      box.textContent = text;
+    function renderRemainingBudgetChart(rows) {
+      const chartRows = getRemainingBudgetChartRows(rows);
+      const labels = chartRows.map(r => r.project);
+      const values = chartRows.map(r => Number(r.remainingBudget || 0));
+
+      const ctx = document.getElementById('remainingBudgetChart').getContext('2d');
+
+      if (remainingBudgetChart) remainingBudgetChart.destroy();
+
+      remainingBudgetChart = new Chart(ctx, {
+        type: 'bar',
+        data: {
+          labels: labels,
+          datasets: [{
+            label: 'Remaining Budget',
+            data: values,
+            backgroundColor: labels.map((_, i) => chartColors[i % chartColors.length]),
+            borderColor: labels.map((_, i) => chartColors[i % chartColors.length]),
+            borderWidth: 1,
+            borderRadius: 8,
+            barThickness: 20
+          }]
+        },
+        options: {
+          indexAxis: 'y',
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: {
+            legend: { display: false },
+            tooltip: {
+              backgroundColor: '#03102a',
+              titleColor: '#ffffff',
+              bodyColor: '#ffffff',
+              borderColor: '#38d9ff',
+              borderWidth: 1,
+              callbacks: {
+                label: context => formatPeso(context.raw)
+              }
+            }
+          },
+          scales: {
+            x: {
+              beginAtZero: true,
+              grid: { color: 'rgba(52, 223, 255, 0.12)' },
+              ticks: {
+                color: '#b9d7ff',
+                callback: value => formatPesoShort(value)
+              }
+            },
+            y: {
+              grid: { display: false },
+              ticks: {
+                color: '#b9d7ff'
+              }
+            }
+          }
+        }
+      });
+    }
+
+    function renderExpenseRecordTable(rows) {
+      const tbody = document.getElementById('expenseRecordTable');
+      const viewAllButton = document.getElementById('viewAllDataButton');
+
+      tbody.innerHTML = '';
+
+      if (!rows.length) {
+        tbody.innerHTML = '<tr><td colspan="7">No daily monitoring expense records found.</td></tr>';
+
+        if (viewAllButton) {
+          viewAllButton.style.display = 'none';
+        }
+
+        return;
+      }
+
+      const visibleRows = isViewingAllData ? rows : rows.slice(0, 30);
+
+      visibleRows.forEach(row => {
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+          <td>${escapeHtml(row.date)}</td>
+          <td>${escapeHtml(row.project)}</td>
+          <td>${escapeHtml(row.activity)}</td>
+          <td>${escapeHtml(row.fundingSource)}</td>
+          <td>${formatPeso(row.allotedBudget)}</td>
+          <td>${formatPeso(row.approvedRBA)}</td>
+          <td>${formatPeso(row.balance)}</td>
+        `;
+        tbody.appendChild(tr);
+      });
+
+      if (viewAllButton) {
+        if (rows.length > 30) {
+          viewAllButton.style.display = 'inline-block';
+          viewAllButton.textContent = isViewingAllData ? 'Show Recent Data ›' : 'View All Data ›';
+        } else {
+          viewAllButton.style.display = 'none';
+        }
+      }
+    }
+
+    function getAllocationStatusClass(status) {
+      if (status === 'Over Allocation') return 'allocation-over';
+      if (status === 'Fully Utilized') return 'allocation-full';
+      if (status === 'Near Limit') return 'allocation-near';
+      return 'allocation-ok';
+    }
+
+    function formatPeso(value) {
+      value = Number(value || 0);
+
+      return '₱' + value.toLocaleString('en-PH', {
+        minimumFractionDigits: 2,
+        maximumFractionDigits: 2
+      });
+    }
+
+    function formatPesoShort(value) {
+      value = Number(value || 0);
+
+      if (Math.abs(value) >= 1000000000) {
+        return '₱' + (value / 1000000000).toFixed(2) + 'B';
+      }
+
+      if (Math.abs(value) >= 1000000) {
+        return '₱' + (value / 1000000).toFixed(2) + 'M';
+      }
+
+      if (Math.abs(value) >= 1000) {
+        return '₱' + (value / 1000).toFixed(2) + 'K';
+      }
+
+      return '₱' + value.toLocaleString('en-PH', {
+        minimumFractionDigits: 2,
+        maximumFractionDigits: 2
+      });
+    }
+
+    function formatPercent(value) {
+      value = Number(value || 0);
+      return (value * 100).toFixed(2) + '%';
+    }
+
+    function formatUpdatedDateTime(value) {
+      if (!value) return 'Live from Google Sheets';
+
+      const text = String(value).trim();
+
+      const match = text.match(/^([A-Za-z]{3,9}\s+\d{1,2},\s+\d{4})\s+(\d{1,2}:\d{2})\s*(AM|PM)$/i);
+
+      if (match) {
+        const datePart = match[1];
+        const timePart = match[2];
+        const meridiem = match[3].toUpperCase();
+
+        return `<span class="line">${datePart}</span><span class="line">${timePart}${meridiem}</span>`;
+      }
+
+      return text;
     }
 
     function escapeHtml(value) {
-      return String(value || "")
-        .replaceAll("&", "&amp;")
-        .replaceAll("<", "&lt;")
-        .replaceAll(">", "&gt;")
-        .replaceAll('"', "&quot;")
-        .replaceAll("'", "&#039;");
+      return String(value || '')
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#039;');
+    }
+
+    function showError(error) {
+      document.getElementById('loader').style.display = 'grid';
+      document.getElementById('dashboard').style.display = 'none';
+
+      document.getElementById('loader').innerHTML = `
+        <div style="max-width:780px;background:#061733;padding:25px;border-radius:18px;box-shadow:0 15px 35px rgba(0,0,0,0.35);border:1px solid rgba(255,77,109,0.45);">
+          <h2 style="margin-top:0;color:#ff4d6d;">Dashboard Loading Error</h2>
+          <p style="color:#eaf4ff;">Please check Apps Script Web App URL, deployment access, and JSONP support in code.gs.</p>
+          <pre style="white-space:pre-wrap;background:#020b1f;color:#ffffff;padding:14px;border-radius:12px;">${error.message || error}</pre>
+        </div>
+      `;
     }
   </script>
 </body>
 </html>
-
